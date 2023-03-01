@@ -6,6 +6,7 @@ on:
     branches:
       - main
 
+jobs:
   statictest:
     runs-on: ubuntu-latest
     container: golang:1.19
