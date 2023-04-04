@@ -207,3 +207,105 @@ jobs:
           shortenertestbeta -test.v -test.run=^TestIteration5$ \
               -binary-path=cmd/shortener/shortener \
               -server-port=$SERVER_PORT
+
+      - name: "Code increment #6"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter6' ||
+          github.head_ref == 'iter7' ||
+          github.head_ref == 'iter8' ||
+          github.head_ref == 'iter9' ||
+          github.head_ref == 'iter10' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration6$ \
+              -source-path=.
+
+      - name: "Code increment #7"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter7' ||
+          github.head_ref == 'iter8' ||
+          github.head_ref == 'iter9' ||
+          github.head_ref == 'iter10' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration7$ \
+              -binary-path=cmd/shortener/shortener \
+              -source-path=.
+
+      - name: "Code increment #8"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter8' ||
+          github.head_ref == 'iter9' ||
+          github.head_ref == 'iter10' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration8$ \
+              -binary-path=cmd/shortener/shortener
+
+      - name: "Code increment #9"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter9' ||
+          github.head_ref == 'iter10' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          TEMP_FILE=$(random tempfile)
+          shortenertestbeta -test.v -test.run=^TestIteration9$ \
+              -binary-path=cmd/shortener/shortener \
+              -source-path=. \
+              -file-storage-path=$TEMP_FILE
