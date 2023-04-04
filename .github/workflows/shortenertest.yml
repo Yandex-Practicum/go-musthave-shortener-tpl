@@ -206,7 +206,3 @@ jobs:
           shortenertestbeta -test.v -test.run=^TestIteration5$ \
               -binary-path=cmd/shortener/shortener \
               -server-port=$SERVER_PORT
-
-          github.head_ref == 'iter24'
-        run: |
-          echo "Not implemented"
