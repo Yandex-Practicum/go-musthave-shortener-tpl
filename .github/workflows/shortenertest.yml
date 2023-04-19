@@ -309,3 +309,127 @@ jobs:
               -binary-path=cmd/shortener/shortener \
               -source-path=. \
               -file-storage-path=$TEMP_FILE
+
+      - name: "Code increment #10"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter10' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration10$ \
+              -binary-path=cmd/shortener/shortener \
+              -source-path=. \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
+
+      - name: "Code increment #11"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter11' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration11$ \
+              -binary-path=cmd/shortener/shortener \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
+
+      - name: "Code increment #12"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter12' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration12$ \
+              -binary-path=cmd/shortener/shortener \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
+
+      - name: "Code increment #13"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter13' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration13$ \
+              -binary-path=cmd/shortener/shortener \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
+
+      - name: "Code increment #14"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter14' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration14$ \
+              -binary-path=cmd/shortener/shortener \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
+
+      - name: "Code increment #15"
+        if: |
+          github.ref == 'refs/heads/main' ||
+          github.head_ref == 'iter15' ||
+          github.head_ref == 'iter16' ||
+          github.head_ref == 'iter17' ||
+          github.head_ref == 'iter18' ||
+          github.head_ref == 'iter19' ||
+          github.head_ref == 'iter20' ||
+          github.head_ref == 'iter21' ||
+          github.head_ref == 'iter22' ||
+          github.head_ref == 'iter23' ||
+          github.head_ref == 'iter24'
+        run: |
+          shortenertestbeta -test.v -test.run=^TestIteration15$ \
+              -binary-path=cmd/shortener/shortener \
+              -database-dsn='postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable'
