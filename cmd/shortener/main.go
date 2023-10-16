@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"io"
+	"github.com/go-chi/chi"
+	"log"
 )
 
 var urls map[string]string // хранилище ссылок
@@ -14,26 +16,16 @@ func main() {
 
 	urls = make(map[string]string)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", checkMethod)
+	r := chi.NewRouter()
+	r.Post("/", handlerPost)
+	r.Get("/{link}", handlerGet)
+	
 
 	fmt.Println("Server is starter")
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		panic(err)
-	}
+	log.Fatal(http.ListenAndServe(":8080", r))
+
 }
 
-// Роутер перенаправляет на обработчик запросов POST или GET
-func checkMethod(rw http.ResponseWriter, rq *http.Request) {
-	fmt.Println("Пришел метод", rq.Method)
-	if rq.Method == http.MethodPost {
-		handlerPost(rw, rq)
-	}
-	if rq.Method == http.MethodGet {
-		handlerGet(rw, rq)
-	}
-}
 
 // Обрабатывает POST-запрос. Возвращает заголовок со статусом 201, если результат Ок
 func handlerPost(rw http.ResponseWriter, rq *http.Request) {
@@ -66,7 +58,7 @@ func handlerPost(rw http.ResponseWriter, rq *http.Request) {
 func handlerGet(rw http.ResponseWriter, rq *http.Request) {
 	fmt.Println("Отрабатывает метод", rq.Method)
 	// Получаем короткий URL из запроса
-	shortURL := rq.URL.String()[1:]
+	shortURL := chi.URLParam(rq, "link")
 	fmt.Println(shortURL)
 
 	fmt.Println(urls)
