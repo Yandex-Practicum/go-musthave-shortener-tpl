@@ -46,6 +46,7 @@ func TestHandlerPost(t *testing.T){
             handlerPost(w, request)
 
             res := w.Result()
+			defer res.Body.Close()
             fmt.Printf("want code = %d StatusCode %d\n", test.want.code, res.StatusCode)
             assert.Equal(t, test.want.code, res.StatusCode)
         })
@@ -97,6 +98,7 @@ func TestHandlerGet(t *testing.T){
             handlerGet(w, request)
 
             res := w.Result()
+			defer res.Body.Close()
             fmt.Printf("want code = %d StatusCode %d\n", test.want.code, res.StatusCode)
             assert.Equal(t, test.want.code, res.StatusCode)
         })
