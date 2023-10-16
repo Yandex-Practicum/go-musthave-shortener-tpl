@@ -17,7 +17,7 @@ func TestHandlerPost(t *testing.T){
       }
     tests := []struct {
         name string
-        body string
+        param string
         want want
     }{
         {
@@ -40,7 +40,7 @@ func TestHandlerPost(t *testing.T){
     for _, test := range tests {
         t.Run(test.name, func(t *testing.T) {
             fmt.Printf("\n\nTest %v Body %v\n", test.name, test.param)
-            param := strings.NewReader(test.body)
+            param := strings.NewReader(test.param)
             request := httptest.NewRequest(http.MethodPost, "/", param)
             w := httptest.NewRecorder()
             handlerPost(w, request)
