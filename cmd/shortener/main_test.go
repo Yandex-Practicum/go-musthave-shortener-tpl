@@ -22,14 +22,14 @@ func TestHandlerPost(t *testing.T){
     }{
         {
             name: "post test 1. body doesn't consist of data",
-            body: "",
+            param: "",
             want: want{
                 code: 400,
             },
         },
         {
             name: "post test 2. body consist of data",
-            body: "http://ya.ru",
+            param: "http://ya.ru",
             want: want{
                 code: 201,
             },
@@ -39,9 +39,9 @@ func TestHandlerPost(t *testing.T){
 
     for _, test := range tests {
         t.Run(test.name, func(t *testing.T) {
-            fmt.Printf("\n\nTest %v Body %v\n", test.name, test.body)
-            body := strings.NewReader(test.body)
-            request := httptest.NewRequest(http.MethodPost, "/", body)
+            fmt.Printf("\n\nTest %v Body %v\n", test.name, test.param)
+            param := strings.NewReader(test.body)
+            request := httptest.NewRequest(http.MethodPost, "/", param)
             w := httptest.NewRecorder()
             handlerPost(w, request)
 
