@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"strconv"
 )
 
 //Переменные используем в качестве БД
-var index []string
 var db map[string]string
 
 
@@ -65,7 +63,6 @@ func shortURL(res http.ResponseWriter, req *http.Request) {
 	short := generateShort()
 
 	//записываем в "БД"
-	index = append(index, short)
 	db[short] = string(reqBody)
 	resBody := `http://localhost:8080/` + short
 	res.Write([]byte(resBody))
@@ -80,21 +77,9 @@ func fullURL(res http.ResponseWriter, req *http.Request) {
 	//Получаем путь из запроса, достаем id и переводим в int
 	path := req.URL.Path
 	
-	num := strings.Split(path, "/")
-	id, err := strconv.Atoi(num[1])
-	if err != nil{
-		res.WriteHeader(http.StatusBadRequest)
-	}
+	short := strings.Split(path, "/")
 
-	//проверка, что есть короткая ссылка с таким id
-	if id < 0 || id >= len(index) {
-		res.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	//получаем из БД сначала короткую ссылку по индексу, а затем полную
-	short := index[id]
-	full, ok := db[short]
+	full, ok := db[short[1]]
 	if !ok {
 		res.WriteHeader(http.StatusBadRequest)
 		return
