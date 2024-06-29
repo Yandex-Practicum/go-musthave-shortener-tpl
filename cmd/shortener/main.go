@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -16,7 +17,7 @@ var db map[string]string
 func generateShort() string{
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
     "abcdefghijklmnopqrstuvwxyz" +
-    "0123456789~=+%^*/()[]{}/!@#$?|")
+    "0123456789")
 	length := 8
 	var b strings.Builder
 	for i := 0; i < length; i++ {
@@ -29,7 +30,7 @@ func main() {
 	db = map[string]string{}
 	mux := http.NewServeMux()
 	mux.HandleFunc(`/`, shortURL)
-	mux.HandleFunc(`/{id}/`, fullURL)
+	mux.HandleFunc(`/{id}`, fullURL)
 
 	err := http.ListenAndServe(`:8080`, mux)
 	if err != nil{
@@ -74,12 +75,16 @@ func fullURL(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//Получаем путь из запроса, достаем id и переводим в int
+	//Получаем путь из запроса
 	path := req.URL.Path
 	
-	short := strings.Split(path, "/")
+	short, _ := strings.CutPrefix(string(path), "/")
+	short, _ = strings.CutSuffix(short, "/")
 
-	full, ok := db[short[1]]
+	fmt.Println(short)
+
+	full, ok := db[short]
+	fmt.Println(full)
 	if !ok {
 		res.WriteHeader(http.StatusBadRequest)
 		return
