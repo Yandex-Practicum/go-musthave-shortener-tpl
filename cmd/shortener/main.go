@@ -13,6 +13,7 @@ import (
 var index []string
 var db map[string]string
 
+
 //generateShort генерирует строку, которая будет использоваться длясокращения URL
 func generateShort() string{
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -27,6 +28,7 @@ func generateShort() string{
 }
 
 func main() {
+	db = map[string]string{}
 	mux := http.NewServeMux()
 	mux.HandleFunc(`/`, shortURL)
 	mux.HandleFunc(`/{id}/`, fullURL)
