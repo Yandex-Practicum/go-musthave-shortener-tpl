@@ -55,6 +55,11 @@ func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
 
 	fullURL := storage.ReadFromStorage(short)
 
+	if fullURL.FullURL == "" {
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	res.Header().Set("location", fullURL.FullURL)
 	res.WriteHeader(http.StatusTemporaryRedirect)
 	res.Write([]byte{})
