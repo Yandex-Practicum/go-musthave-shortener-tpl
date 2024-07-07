@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/storage"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -82,31 +84,36 @@ func TestGetByIDHandler(t *testing.T) {
 	}{
 		{
 			method: http.MethodGet,
-			requestID: "/U8rtGB25",
+			requestID: "U8rtGB25",
 			expectedCode: 307, 
 			expectedLocation: "https://practicum.yandex.ru/",
 		},
 		{
 			method: http.MethodGet,
-			requestID: "/g7RETf01/",
+			requestID: "g7RETf01",
 			expectedCode: 307, 
 			expectedLocation: "https://mail.ru/",
 		},
 		{
 			method: http.MethodGet,
-			requestID: "/yyokley",
+			requestID: "yyokley",
 			expectedCode: 400,
 		},
 		{
 			method: http.MethodPatch,
-			requestID: "/yoyoyo",
+			requestID: "yoyoyo",
 			expectedCode: 405,
 		},
 	}
 
 	for _, test := range tests{
 		t.Run(test.method, func (t *testing.T)  {
-			req := httptest.NewRequest(test.method, srv.URL+test.requestID, nil)
+			req := httptest.NewRequest(test.method, srv.URL+"/"+test.requestID, nil)
+
+			cntx := chi.NewRouteContext()
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, cntx))
+			cntx.URLParams.Add("id", test.requestID)
+
 			w := httptest.NewRecorder()
 			h := http.HandlerFunc(GetByIDHandler)
 			h(w, req)
