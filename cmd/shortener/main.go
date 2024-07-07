@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/handlers"
 	"github.com/go-chi/chi/v5"
@@ -20,6 +21,10 @@ func main() {
 	router.Post(`/`, handlers.PostHandler)
 	router.Get(`/{id}`, handlers.GetByIDHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	conf := config.ParseFlag()
+
+	serverAdd := "http://"+conf.Serv
+
+	log.Fatal(http.ListenAndServe(serverAdd, router))
 }
 

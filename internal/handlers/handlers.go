@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/helpers"
 	"github.com/IgorGreusunset/shortener/internal/storage"
@@ -38,7 +39,9 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 
-	resBody := `http://localhost:8080/`+id
+	conf := config.ParseFlag()
+
+	resBody := conf.Base + `/` + id
 	res.Write([]byte(resBody))
 }
 
@@ -48,10 +51,6 @@ func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	/*path := req.URL.Path
-
-	short, _ := strings.CutPrefix(string(path), "/")
-	short, _ = strings.CutSuffix(short, "/")*/
 
 	short := chi.URLParam(req, "id")
 
