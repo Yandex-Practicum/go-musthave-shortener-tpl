@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
+
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/handlers"
+	"github.com/go-chi/chi/v5"
 )
 
 //Переменные используем в качестве БД
@@ -12,14 +15,11 @@ var Storage []model.URL = []model.URL{}
 
 
 func main() {
-	//Storage = []model.URL{}
-	mux := http.NewServeMux()
-	mux.HandleFunc(`/`, handlers.PostHandler)
-	mux.HandleFunc(`/{id}`, handlers.GetByIDHandler)
+	router := chi.NewRouter()
 
-	err := http.ListenAndServe(`:8080`, mux)
-	if err != nil{
-		panic(err)
-	}
+	router.Post(`/`, handlers.PostHandler)
+	router.Get(`/{id}`, handlers.GetByIDHandler)
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 

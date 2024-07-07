@@ -4,11 +4,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/helpers"
 	"github.com/IgorGreusunset/shortener/internal/storage"
+	"github.com/go-chi/chi/v5"
 )
 
 func PostHandler(res http.ResponseWriter, req *http.Request) {
@@ -48,10 +48,12 @@ func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	path := req.URL.Path
+	/*path := req.URL.Path
 
 	short, _ := strings.CutPrefix(string(path), "/")
-	short, _ = strings.CutSuffix(short, "/")
+	short, _ = strings.CutSuffix(short, "/")*/
+
+	short := chi.URLParam(req, "id")
 
 	fullURL := storage.ReadFromStorage(short)
 
