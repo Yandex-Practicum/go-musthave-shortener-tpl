@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"io"
+	"log"
 	"net/http"
-	//"net/url"
+	"net/url"
 
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
@@ -29,6 +30,13 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}*/
+
+	_, err = url.Parse(string(reqBody))
+	if err != nil {
+		log.Printf("Error parsing decoded URI: %v\n", err)
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	id := helpers.Generate()
 
