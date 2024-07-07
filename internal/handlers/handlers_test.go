@@ -3,53 +3,62 @@ package handlers
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/storage"
+	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPostHandler(t *testing.T) {
 	storage.Storage = []model.URL{}
-	type want struct {
-		code        int
-		contentType string
-	}
+
+	handler := http.HandlerFunc(PostHandler)
+
+	srv := httptest.NewServer(handler)
+
+	defer srv.Close()
+
+
 	tests := []struct {
-		name string
-		body string
-		want want
+		method string
+		reqBody string
+		expectedCode int
+		expectedContent string
 	}{
 		{
-			name: "normal test",
-			body: "https://mail.ru/",
-			want: want{
-				code:        201,
-				contentType: "text/plain",
-			},
+			method: http.MethodPost,
+			reqBody: "https://mail.ru/",
+			expectedCode:        201,
+			expectedContent: "text/plain",
+			
 		},
 		{
-			name: "not url test",
-			body: "some text not url",
-			want: want{code: 400},
+			method: http.MethodPost,
+			reqBody: "some text not url",
+			expectedCode: 400,
+			expectedContent: "",
+		},
+		{
+			method: http.MethodGet,
+			reqBody: "https://mail.ru/",
+			expectedCode: 405,
+			expectedContent: "",
 		},
 	}
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			reqBody := strings.NewReader(test.body)
-			request := httptest.NewRequest(http.MethodPost, `/`, reqBody)
-			w := httptest.NewRecorder()
-			h := http.HandlerFunc(PostHandler)
-			h(w, request)
+		t.Run(test.method, func(t *testing.T) {
+			req := resty.New().R()
+			req.Method = test.method
+			req.URL = srv.URL
+			req.Body = test.reqBody
 
-			result := w.Result()
+			resp, err := req.Send()
+			assert.NoError(t, err, "error making HTTP request")
 
-			defer result.Body.Close()
-
-			assert.Equal(t, test.want.code, result.StatusCode)
-			assert.Equal(t, test.want.contentType, result.Header.Get("Content-Type"))
+			assert.Equal(t, test.expectedCode, resp.StatusCode(), "Response code didn't match expected")
+			assert.Equal(t, test.expectedContent, resp.Header().Get("Content-Type"))
 		})
 	}
 }
@@ -60,46 +69,53 @@ func TestGetByIDHandler(t *testing.T) {
 		{ID: "g7RETf01", FullURL: "https://mail.ru/"},
 	}
 
-	type want struct {
-		code int
-		location string
-	}
+	handler := http.HandlerFunc(GetByIDHandler)
+	srv := httptest.NewServer(handler)
+	defer srv.Close()
+
 
 	tests := []struct{
-		name string
-		request string
-		want want
+		method string
+		requestID string
+		expectedCode int
+		expectedLocation string
 	}{
 		{
-			name: "normal 1",
-			request: "/U8rtGB25",
-			want: want{code: 307, location: "https://practicum.yandex.ru/"},
+			method: http.MethodGet,
+			requestID: "/U8rtGB25",
+			expectedCode: 307, 
+			expectedLocation: "https://practicum.yandex.ru/",
 		},
 		{
-			name: "normal 2",
-			request: "/g7RETf01/",
-			want: want{code: 307, location: "https://mail.ru/"},
+			method: http.MethodGet,
+			requestID: "/g7RETf01/",
+			expectedCode: 307, 
+			expectedLocation: "https://mail.ru/",
 		},
 		{
-			name: "not found",
-			request: "/yyokley",
-			want: want{code: 400},
+			method: http.MethodGet,
+			requestID: "/yyokley",
+			expectedCode: 400,
+		},
+		{
+			method: http.MethodPatch,
+			requestID: "/yoyoyo",
+			expectedCode: 405,
 		},
 	}
 
 	for _, test := range tests{
-		t.Run(test.name, func (t *testing.T)  {
-			request := httptest.NewRequest(http.MethodGet, test.request, nil)
-			w := httptest.NewRecorder()
-			h := http.HandlerFunc(GetByIDHandler)
-			h(w, request)
+		t.Run(test.method, func (t *testing.T)  {
+			req := resty.New().R()
+			req.Method = test.method
+			req.URL = srv.URL + test.requestID
 
-			result := w.Result()
+			resp, err := req.Send()
+			assert.NoError(t, err, "error making HTTP request")
 
-			defer result.Body.Close()
-			
-			assert.Equal(t, test.want.code, result.StatusCode)
-			assert.Equal(t, test.want.location, result.Header.Get("Location"))
+			assert.Equal(t, test.expectedCode, resp.StatusCode(), "Response code didn't match expected")
+			assert.Equal(t, test.expectedLocation, resp.Header().Get("Location"), "Response Location didn't match expected")
+
 		})
 	}
 }
