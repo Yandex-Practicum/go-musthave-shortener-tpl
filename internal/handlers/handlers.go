@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -25,18 +24,18 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	/*_, err = url.ParseRequestURI(string(reqBody))
+	_, err = url.ParseRequestURI(string(reqBody))
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		return
-	}*/
+	}
 
-	_, err = url.Parse(string(reqBody))
+	/*_, err = url.Parse(string(reqBody))
 	if err != nil {
 		log.Printf("Error parsing decoded URI: %v\n", err)
 		res.WriteHeader(http.StatusBadRequest)
 		return
-	}
+	}*/
 
 	id := helpers.Generate()
 
