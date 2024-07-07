@@ -39,9 +39,9 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 
-	conf := config.ParseFlag()
+	config.ParseFlag()
 
-	resBody := conf.Base + `/` + id
+	resBody := config.Base + `/` + id
 	res.Write([]byte(resBody))
 }
 
