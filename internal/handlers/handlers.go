@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"io"
-	"log"
 	"net/http"
 	//"net/url"
 
@@ -14,7 +13,6 @@ import (
 )
 
 func PostHandler(res http.ResponseWriter, req *http.Request) {
-	log.Printf("Received POST request: %v\n", req)
 	if req.Method != http.MethodPost {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -29,7 +27,6 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 	/*_, err = url.ParseRequestURI(string(reqBody))
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		log.Printf("Bad Url")
 		return
 	}*/
 

@@ -11,7 +11,7 @@ var (
 
 func ParseFlag() {
 	flag.StringVar(&Serv, "a", "localhost:8080", "address  to run server")
-	flag.StringVar(&Base, "b", "http://localhost:8000", "base address for short URL")
+	flag.StringVar(&Base, "b", "http://localhost:8080", "base address for short URL")
 	flag.Parse()
 
 	if Serv == "" {
@@ -19,7 +19,7 @@ func ParseFlag() {
 	}
 
 	if Base == "" {
-		Base = "http://localhost:8000"
+		Base = "http://localhost:8080"
 	}
 
 }
