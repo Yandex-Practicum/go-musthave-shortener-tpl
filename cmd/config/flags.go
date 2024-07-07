@@ -21,4 +21,5 @@ func ParseFlag() {
 	if Base == "" {
 		Base = "http://localhost:8000"
 	}
+
 }

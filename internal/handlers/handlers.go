@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"io"
+	"log"
 	"net/http"
-	"net/url"
+	//"net/url"
 
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
@@ -13,6 +14,7 @@ import (
 )
 
 func PostHandler(res http.ResponseWriter, req *http.Request) {
+	log.Printf("Received POST request: %v\n", req)
 	if req.Method != http.MethodPost {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -24,11 +26,12 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = url.ParseRequestURI(string(reqBody))
+	/*_, err = url.ParseRequestURI(string(reqBody))
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
+		log.Printf("Bad Url")
 		return
-	}
+	}*/
 
 	id := helpers.Generate()
 
@@ -39,7 +42,7 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 
-	config.ParseFlag()
+	//config.ParseFlag()
 
 	resBody := config.Base + `/` + id
 	res.Write([]byte(resBody))
