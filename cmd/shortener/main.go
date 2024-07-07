@@ -21,9 +21,9 @@ func main() {
 	router.Post(`/`, handlers.PostHandler)
 	router.Get(`/{id}`, handlers.GetByIDHandler)
 
-	conf := config.ParseFlag()
+	config.ParseFlag()
 
-	serverAdd := "http://"+conf.Serv
+	serverAdd := config.Serv
 
 	log.Fatal(http.ListenAndServe(serverAdd, router))
 }
