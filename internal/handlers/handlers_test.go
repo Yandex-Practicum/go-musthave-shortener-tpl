@@ -106,15 +106,17 @@ func TestGetByIDHandler(t *testing.T) {
 
 	for _, test := range tests{
 		t.Run(test.method, func (t *testing.T)  {
-			req := resty.New().R()
-			req.Method = test.method
-			req.URL = srv.URL + test.requestID
+			req := httptest.NewRequest(test.method, srv.URL+test.requestID, nil)
+			w := httptest.NewRecorder()
+			h := http.HandlerFunc(GetByIDHandler)
+			h(w, req)
 
-			resp, err := req.Send()
-			assert.NoError(t, err, "error making HTTP request")
+			res := w.Result()
 
-			assert.Equal(t, test.expectedCode, resp.StatusCode(), "Response code didn't match expected")
-			assert.Equal(t, test.expectedLocation, resp.Header().Get("Location"), "Response Location didn't match expected")
+			defer res.Body.Close()
+
+			assert.Equal(t, test.expectedCode, res.StatusCode, "Response code didn't match expected")
+			assert.Equal(t, test.expectedLocation, res.Header.Get("Location"), "Response Location didn't match expected")
 
 		})
 	}

@@ -60,7 +60,7 @@ func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	res.Header().Set("location", fullURL.FullURL)
+	res.Header().Set("Location", fullURL.FullURL)
 	res.WriteHeader(http.StatusTemporaryRedirect)
 	res.Write([]byte{})
 }
