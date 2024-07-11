@@ -1,24 +1,36 @@
 package mapStorage
 
 import (
-	"encoding/base64"
 	"errors"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/url"
-	"log"
+	"sync"
 )
 
-var MapStorage = url.NewMapUrl()
+type MapStorage struct {
+	storage map[string]string
+	mu      sync.RWMutex
+}
 
-func EncodeURL(url string) (string, error) {
-
-	lenWord := 6
-	if url != "" {
-		var shortURL string
-		startCoder := len(base64.StdEncoding.EncodeToString([]byte(url)))
-		shortURL = base64.StdEncoding.EncodeToString([]byte(url))[startCoder-lenWord:]
-		log.Println("URL encoded successfully")
-		return shortURL, nil
+func NewMapUrl() *MapStorage {
+	return &MapStorage{
+		storage: make(map[string]string),
 	}
+}
 
-	return "", errors.New("URL is empty")
+func (s *MapStorage) SaveURL(shortURL, url string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if url == "" {
+		return errors.New("URL is empty")
+	}
+	s.storage[shortURL] = url
+	return nil
+}
+
+func (s *MapStorage) GetURL(shortURL string) (string, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if _, ok := s.storage[shortURL]; !ok {
+		return "", errors.New("URL not found")
+	}
+	return s.storage[shortURL], nil
 }
