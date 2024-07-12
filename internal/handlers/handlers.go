@@ -49,6 +49,11 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 
 func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
+	if req.Method != http.MethodGet {
+		res.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	short := chi.URLParam(req, "id")
 
 	fullURL := db.GetByID(short)
