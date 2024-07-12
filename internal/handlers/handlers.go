@@ -58,10 +58,9 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 		return
 	}
 
-
 	short := chi.URLParam(req, "id")
 
-	fullURL := db.GetById(short)
+	fullURL := db.GetByID(short)
 
 	if fullURL.FullURL == "" {
 		res.WriteHeader(http.StatusBadRequest)
