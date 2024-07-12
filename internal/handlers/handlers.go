@@ -13,16 +13,13 @@ import (
 )
 
 func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
-		res.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	reqBody, err := io.ReadAll(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	defer req.Body.Close()
 
 	_, err = url.ParseRequestURI(string(reqBody))
 	if err != nil {
@@ -30,12 +27,6 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	/*_, err = url.Parse(string(reqBody))
-	if err != nil {
-		log.Printf("Error parsing decoded URI: %v\n", err)
-		res.WriteHeader(http.StatusBadRequest)
-		return
-	}*/
 
 	id := helpers.Generate()
 
@@ -46,17 +37,12 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 
 	res.WriteHeader(http.StatusCreated)
 
-	//config.ParseFlag()
 
 	resBody := config.Base + `/` + id
 	res.Write([]byte(resBody))
 }
 
 func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
-		res.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 
 	short := chi.URLParam(req, "id")
 
@@ -69,5 +55,4 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 
 	res.Header().Set("Location", fullURL.FullURL)
 	res.WriteHeader(http.StatusTemporaryRedirect)
-	res.Write([]byte{})
 }

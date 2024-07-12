@@ -1,9 +1,14 @@
 package storage
 
-import model "github.com/IgorGreusunset/shortener/internal/app"
+import (
+	"sync"
+
+	model "github.com/IgorGreusunset/shortener/internal/app"
+)
 
 type Storage struct {
 	db map[string]model.URL
+	mu sync.RWMutex
 }
 
 func NewStorage(db map[string]model.URL) *Storage {
@@ -16,10 +21,16 @@ type Repository interface {
 }
 
 func (s *Storage) Create(record model.URL) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.db[record.ID] = record
 }
 
 func (s *Storage) GetByID(id string) model.URL {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	url, exists := s.db[id]
 	if !exists {
 		return model.URL{}
