@@ -7,19 +7,28 @@ import (
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/handlers"
+	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
 )
 
-//Переменные используем в качестве БД
-var Storage []model.URL = []model.URL{}
 
 
 
 func main() {
 	router := chi.NewRouter()
 
-	router.Post(`/`, handlers.PostHandler)
-	router.Get(`/{id}`, handlers.GetByIDHandler)
+	db := storage.NewStorage(map[string]model.URL{})
+
+	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+		handlers.PostHandler(db, res, req)
+	}
+
+	GetHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+		handlers.GetByIDHandler(db, res, req)
+	}
+
+	router.Post(`/`, PostHandlerWrapper)
+	router.Get(`/{id}`, GetHandlerWrapper)
 
 	config.ParseFlag()
 

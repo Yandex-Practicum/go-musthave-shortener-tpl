@@ -14,9 +14,13 @@ import (
 )
 
 func TestPostHandler(t *testing.T) {
-	storage.Storage = []model.URL{}
+	db := storage.NewStorage(map[string]model.URL{})
 
-	handler := http.HandlerFunc(PostHandler)
+	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+		PostHandler(db, res, req)
+	}
+
+	handler := http.HandlerFunc(PostHandlerWrapper)
 
 	srv := httptest.NewServer(handler)
 
@@ -66,12 +70,16 @@ func TestPostHandler(t *testing.T) {
 }
 
 func TestGetByIDHandler(t *testing.T) {
-	storage.Storage = []model.URL{
-		{ID: "U8rtGB25", FullURL: "https://practicum.yandex.ru/"},
-		{ID: "g7RETf01", FullURL: "https://mail.ru/"},
+	db := storage.NewStorage(map[string]model.URL{
+		"U8rtGB25": model.URL{ID: "U8rtGB25", FullURL: "https://practicum.yandex.ru/"},
+		"g7RETf01": model.URL{ID: "g7RETf01", FullURL: "https://mail.ru/"},
+	})
+
+	GetHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+		GetByIDHandler(db, res, req)
 	}
 
-	handler := http.HandlerFunc(GetByIDHandler)
+	handler := http.HandlerFunc(GetHandlerWrapper)
 	srv := httptest.NewServer(handler)
 	defer srv.Close()
 
@@ -115,7 +123,7 @@ func TestGetByIDHandler(t *testing.T) {
 			cntx.URLParams.Add("id", test.requestID)
 
 			w := httptest.NewRecorder()
-			h := http.HandlerFunc(GetByIDHandler)
+			h := http.HandlerFunc(GetHandlerWrapper)
 			h(w, req)
 
 			res := w.Result()

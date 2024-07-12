@@ -2,20 +2,30 @@ package storage
 
 import model "github.com/IgorGreusunset/shortener/internal/app"
 
-var Storage []model.URL = []model.URL{}
 
-func WriteToStorage(record model.URL){
-	Storage = append(Storage, record)
+
+type Storage struct {
+	db map[string]model.URL
 }
 
-func ReadFromStorage(id string) *model.URL{
-	var fullURL model.URL
+func NewStorage(db map[string]model.URL) *Storage{
+	return &Storage{db: db}
+}
 
-	for _, v := range Storage {
-		if v.ID == id {
-			fullURL = v
-		}
+type Repository interface {
+	Create(record model.URL)
+	GetById(id string) model.URL
+}
+
+func (s *Storage) Create(record model.URL){
+	s.db[record.ID] = record
+}
+
+func (s *Storage) GetById(id string) model.URL{
+	url, exists := s.db[id]
+	if !exists {
+		return model.URL{}
 	}
 
-	return &fullURL
+	return url
 }

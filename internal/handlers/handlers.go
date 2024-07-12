@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func PostHandler(res http.ResponseWriter, req *http.Request) {
+func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -40,7 +40,7 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 	id := helpers.Generate()
 
 	urlToAdd := model.NewURL(id, string(reqBody))
-	storage.WriteToStorage(*urlToAdd)
+	db.Create(*urlToAdd)
 
 	res.Header().Set("Content-type", "text/plain")
 
@@ -52,7 +52,7 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 	res.Write([]byte(resBody))
 }
 
-func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
+func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -61,7 +61,7 @@ func GetByIDHandler(res http.ResponseWriter, req *http.Request) {
 
 	short := chi.URLParam(req, "id")
 
-	fullURL := storage.ReadFromStorage(short)
+	fullURL := db.GetById(short)
 
 	if fullURL.FullURL == "" {
 		res.WriteHeader(http.StatusBadRequest)
