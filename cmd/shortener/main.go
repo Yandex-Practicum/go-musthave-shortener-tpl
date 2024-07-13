@@ -10,14 +10,19 @@ import (
 )
 
 func main() {
+
 	storage := mapStorage.NewMapUrl()
+	log.Println("Storage created")
 	urlService := service.NewService(storage)
+	log.Println("Service created")
+	configs := NewConfigs()
+	configs.ParseFlags()
 	shortHandlers := handlers.NewHandlers(urlService)
+	log.Println("Handlers created")
 	r := chi.NewRouter()
 	r.Post("/", shortHandlers.PostURL)
 	r.Get("/{url}", shortHandlers.GetURL)
-
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		log.Fatal(err)
 	}
 }
