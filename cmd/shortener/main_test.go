@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapStorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,7 +38,7 @@ func TestWebhook(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// вызовем хендлер как обычную функцию, без запуска самого сервера
-			storage := mapStorage.NewMapUrl()
+			storage := mapstorage.NewMapUrl()
 			urlService := service.NewService(storage)
 			shortHandlers := handlers.NewHandlers(urlService)
 

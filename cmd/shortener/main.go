@@ -4,14 +4,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapStorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"log"
 	"net/http"
 )
 
 func main() {
 
-	storage := mapStorage.NewMapUrl()
+	storage := mapstorage.NewMapURL()
 	log.Println("Storage created")
 	urlService := service.NewService(storage)
 	log.Println("Service created")

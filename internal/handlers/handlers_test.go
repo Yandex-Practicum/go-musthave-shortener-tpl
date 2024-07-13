@@ -3,7 +3,7 @@ package handlers
 import (
 	"bytes"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapStorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -16,7 +16,7 @@ import (
 
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
-	storage := mapStorage.NewMapUrl()
+	storage := mapstorage.NewMapUrl()
 	urlService := service.NewService(storage)
 	shortHandlers := NewHandlers(urlService)
 
@@ -55,7 +55,7 @@ func TestPostURL(t *testing.T) {
 
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
-	storage := mapStorage.NewMapUrl()
+	storage := mapstorage.NewMapUrl()
 	urlService := service.NewService(storage)
 	shortHandlers := NewHandlers(urlService)
 	t.Run("Success", func(t *testing.T) {

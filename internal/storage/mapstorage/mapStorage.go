@@ -1,4 +1,4 @@
-package mapStorage
+package mapstorage
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ type MapStorage struct {
 	mu      sync.RWMutex
 }
 
-func NewMapUrl() *MapStorage {
+func NewMapURL() *MapStorage {
 	return &MapStorage{
 		storage: make(map[string]string),
 	}
