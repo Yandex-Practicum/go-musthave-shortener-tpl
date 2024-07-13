@@ -11,15 +11,17 @@ type Storage struct {
 	mu sync.RWMutex
 }
 
+//Фабричный метод создания нового экземпляра хранилища
 func NewStorage(db map[string]model.URL) *Storage {
 	return &Storage{db: db}
 }
 
 type Repository interface {
 	Create(record model.URL)
-	GetByID(id string) model.URL
+	GetByID(id string) (model.URL, bool)
 }
 
+//Метод для создания новой записи в хранилище
 func (s *Storage) Create(record model.URL) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -27,14 +29,11 @@ func (s *Storage) Create(record model.URL) {
 	s.db[record.ID] = record
 }
 
-func (s *Storage) GetByID(id string) model.URL {
+//Метода для получения записи из хранилища
+func (s *Storage) GetByID(id string)(model.URL, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	url, exists := s.db[id]
-	if !exists {
-		return model.URL{}
-	}
-
-	return url
+	url, ok := s.db[id]
+	return url, ok
 }

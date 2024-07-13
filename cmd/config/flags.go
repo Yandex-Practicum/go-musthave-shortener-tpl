@@ -25,7 +25,7 @@ func ParseFlag() {
 	baseFlag := flag.String("b", defaultBase, "base address for short URL")
 	flag.Parse()
 
-
+	//Проверяем наличие адресов в переменном окружении, если их нет - берем адреса из флагов.
 	if Serv == "" {
 		Serv = *servFlag
 	}

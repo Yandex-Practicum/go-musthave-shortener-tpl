@@ -6,6 +6,7 @@ type URL struct {
 	FullURL string
 }
 
+//Фабричный метод для создания экземпляра URL структуры
 func NewURL(id, full string) *URL {
 	return &URL{
 		ID:      id,

@@ -10,7 +10,6 @@ import (
 	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-resty/resty/v2"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPostHandler(t *testing.T) {
@@ -28,28 +27,32 @@ func TestPostHandler(t *testing.T) {
 
 
 	tests := []struct {
+		name string
 		method string
 		reqBody string
 		expectedCode int
 		expectedContent string
 	}{
 		{
+			name: "normal case",
 			method: http.MethodPost,
 			reqBody: "https://mail.ru/",
-			expectedCode:        201,
+			expectedCode:        http.StatusCreated,
 			expectedContent: "text/plain",
 			
 		},
 		{
+			name: "not url case",
 			method: http.MethodPost,
 			reqBody: "some text not url",
-			expectedCode: 400,
+			expectedCode: http.StatusBadRequest,
 			expectedContent: "",
 		},
 		{
+			name: "get case",
 			method: http.MethodGet,
 			reqBody: "https://mail.ru/",
-			expectedCode: 405,
+			expectedCode: http.StatusNotFound,
 			expectedContent: "",
 		},
 	}
@@ -61,10 +64,18 @@ func TestPostHandler(t *testing.T) {
 			req.Body = test.reqBody
 
 			resp, err := req.Send()
-			assert.NoError(t, err, "error making HTTP request")
 
-			assert.Equal(t, test.expectedCode, resp.StatusCode(), "Response code didn't match expected")
-			assert.Equal(t, test.expectedContent, resp.Header().Get("Content-Type"))
+			if err != nil {
+				t.Errorf("error making HTTP request: %v", err)
+			}
+
+			if resp.StatusCode() != test.expectedCode {
+				t.Errorf("Response code didn't match expected: got %d want %d", resp.StatusCode(), test.expectedCode)
+			}
+
+			if resp.Header().Get("Content-Type") != test.expectedContent {
+				t.Errorf("Response content-type didn't match expected: got %v want %v", resp.Header().Get("Content-Type"), test.expectedContent)
+			}
 		})
 	}
 }
@@ -85,32 +96,37 @@ func TestGetByIDHandler(t *testing.T) {
 
 
 	tests := []struct{
+		name string
 		method string
 		requestID string
 		expectedCode int
 		expectedLocation string
 	}{
 		{
+			name: "normal practicum",
 			method: http.MethodGet,
 			requestID: "U8rtGB25",
-			expectedCode: 307, 
+			expectedCode: http.StatusTemporaryRedirect, 
 			expectedLocation: "https://practicum.yandex.ru/",
 		},
 		{
+			name: "normal mail",
 			method: http.MethodGet,
 			requestID: "g7RETf01",
-			expectedCode: 307, 
+			expectedCode: http.StatusTemporaryRedirect, 
 			expectedLocation: "https://mail.ru/",
 		},
 		{
+			name: "id not in storage",
 			method: http.MethodGet,
 			requestID: "yyokley",
-			expectedCode: 400,
+			expectedCode: http.StatusBadRequest,
 		},
 		{
+			name: "not get method",
 			method: http.MethodPatch,
 			requestID: "yoyoyo",
-			expectedCode: 405,
+			expectedCode: http.StatusMethodNotAllowed,
 		},
 	}
 
@@ -130,9 +146,13 @@ func TestGetByIDHandler(t *testing.T) {
 
 			defer res.Body.Close()
 
-			assert.Equal(t, test.expectedCode, res.StatusCode, "Response code didn't match expected")
-			assert.Equal(t, test.expectedLocation, res.Header.Get("Location"), "Response Location didn't match expected")
+			if res.StatusCode != test.expectedCode {
+				t.Errorf("Response code didn't match expected: got %d want %d", res.StatusCode, test.expectedCode)
+			}
 
+			if res.Header.Get("Location") != test.expectedLocation {
+				t.Errorf("Response Location didn't match expected: got %v want %v", res.Header.Get("Location"), test.expectedLocation)
+			}
 		})
 	}
 }

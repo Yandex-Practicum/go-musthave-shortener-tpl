@@ -19,6 +19,7 @@ func main() {
 
 	db := storage.NewStorage(map[string]model.URL{})
 
+	//Обертки для handlers, чтобы использовать их в роутере
 	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
 		handlers.PostHandler(db, res, req)
 	}

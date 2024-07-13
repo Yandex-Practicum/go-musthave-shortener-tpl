@@ -9,6 +9,7 @@ var chars = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 "abcdefghijklmnopqrstuvwxyz" +
 "0123456789")
 
+//Генерирует случайный ID для короткой ссылки
 func Generate() string {
 	length := 8
 	var b strings.Builder
