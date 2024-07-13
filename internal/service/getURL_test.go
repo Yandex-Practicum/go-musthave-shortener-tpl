@@ -7,8 +7,8 @@ import (
 )
 
 func TestGetURL(t *testing.T) {
-	storageUrl := mapstorage.NewMapURL()
-	service := NewService(storageUrl)
+	storageURL := mapstorage.NewMapURL()
+	service := NewService(storageURL)
 	t.Run("get URL", func(t *testing.T) {
 		url, err := service.GetURL("")
 		assert.NotNil(t, err)

@@ -38,7 +38,7 @@ func TestWebhook(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// вызовем хендлер как обычную функцию, без запуска самого сервера
-			storage := mapstorage.NewMapUrl()
+			storage := mapstorage.NewMapURL()
 			urlService := service.NewService(storage)
 			shortHandlers := handlers.NewHandlers(urlService)
 

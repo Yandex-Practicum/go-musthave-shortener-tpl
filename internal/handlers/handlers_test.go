@@ -16,7 +16,7 @@ import (
 
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
-	storage := mapstorage.NewMapUrl()
+	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
 	shortHandlers := NewHandlers(urlService)
 
@@ -55,7 +55,7 @@ func TestPostURL(t *testing.T) {
 
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
-	storage := mapstorage.NewMapUrl()
+	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
 	shortHandlers := NewHandlers(urlService)
 	t.Run("Success", func(t *testing.T) {

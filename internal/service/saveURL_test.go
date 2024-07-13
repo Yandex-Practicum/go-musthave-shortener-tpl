@@ -7,8 +7,8 @@ import (
 )
 
 func TestService_SaveURL(t *testing.T) {
-	storageUrl := mapstorage.NewMapURL()
-	service := NewService(storageUrl)
+	storageURL := mapstorage.NewMapURL()
+	service := NewService(storageURL)
 
 	t.Run("save URL", func(t *testing.T) {
 		_, err := service.SaveURL("")
