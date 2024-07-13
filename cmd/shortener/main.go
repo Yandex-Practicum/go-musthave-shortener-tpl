@@ -16,7 +16,7 @@ func main() {
 	urlService := service.NewService(storage)
 	log.Println("Service created")
 	configs := NewConfigs()
-	configs.ParseFlags()
+	configs.Parse()
 	shortHandlers := handlers.NewHandlers(urlService)
 	log.Println("Handlers created")
 	r := chi.NewRouter()
