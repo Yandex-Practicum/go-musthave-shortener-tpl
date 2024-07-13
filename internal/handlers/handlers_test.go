@@ -52,7 +52,7 @@ func TestPostHandler(t *testing.T) {
 			name: "get case",
 			method: http.MethodGet,
 			reqBody: "https://mail.ru/",
-			expectedCode: http.StatusNotFound,
+			expectedCode: http.StatusMethodNotAllowed,
 			expectedContent: "",
 		},
 	}
