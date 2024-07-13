@@ -73,7 +73,7 @@ func TestGetURL(t *testing.T) {
 		shortHandlers.GetURL(wResonse, rRequest)
 
 		// Проверяем, что статус ответа - 200 OK
-		assert.Equal(t, http.StatusOK, wResonse.Code)
+		assert.Equal(t, http.StatusTemporaryRedirect, wResonse.Code)
 
 		// Проверяем, что тело ответа содержит URL
 		responseURL = wResonse.Body.String()

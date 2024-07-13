@@ -43,7 +43,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Println("URL encoded successfully")
+
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("https://localhost:8080/" + encodeURL))
@@ -53,7 +53,7 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET URL")
 
 	shortURL := r.URL.String()[1:]
-
+	log.Println(shortURL)
 	if shortURL == "" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
