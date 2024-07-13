@@ -18,10 +18,11 @@ func main() {
 	configs := NewConfigs()
 	configs.Parse()
 	shortHandlers := handlers.NewHandlers(urlService)
-	log.Println("Handlers created")
+	log.Printf("Handlers created %s", configs.AddrServer)
 	r := chi.NewRouter()
-	r.Post("/", shortHandlers.PostURL)
-	r.Get("/{url}", shortHandlers.GetURL)
+	r.HandleFunc("POST /", shortHandlers.PostURL)
+	r.HandleFunc("GET /{id}", shortHandlers.GetURL)
+
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		log.Fatal(err)
 	}

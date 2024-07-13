@@ -39,9 +39,9 @@ func (c *Configs) Parse() {
 
 func (c *Configs) parseFlags() {
 	// Флаг -a отвечает за адрес запуска HTTP-сервера (значение может быть таким: localhost:8888).
-	flag.StringVar(&c.AddrServer, "a", "localhost:8080", "address server")
+	flag.StringVar(&c.AddrServer, "a", ":8080", "Server address host:port")
 	//Флаг -b отвечает за базовый адрес результирующего сокращённого URL (значение: адрес сервера перед коротким URL,
 	//например http://localhost:8000/qsd54gFg).
-	flag.StringVar(&c.BaseURL, "b", "http://localhost:8000/qsd54gFg", "address prefix")
+	flag.StringVar(&c.BaseURL, "b", "http://localhost:8000", "Result net address host:port")
 	flag.Parse()
 }
