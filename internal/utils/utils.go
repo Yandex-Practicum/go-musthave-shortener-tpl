@@ -1,21 +1,25 @@
 package utils
 
 import (
-	"encoding/base64"
 	"errors"
-	"log"
+	"math/rand"
+)
+
+const (
+	lengthShortURL = 5
+	letterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
 func EncodeURL(url string) (string, error) {
 
-	lenWord := 6
+	b := make([]byte, lengthShortURL)
 	if url != "" {
-		var shortURL string
-		startCoder := len(base64.StdEncoding.EncodeToString([]byte(url)))
-		shortURL = base64.StdEncoding.EncodeToString([]byte(url))[startCoder-lenWord:]
-		log.Println("URL encoded successfully", shortURL)
 
-		return shortURL, nil
+		for i := range b {
+			b[i] = letterBytes[rand.Intn(len(letterBytes))]
+		}
+
+		return string(b), nil
 	}
 
 	return "", errors.New("URL is empty")
