@@ -10,11 +10,13 @@ import (
 
 type Handlers struct {
 	service *service.Service
+	baseURL string
 }
 
-func NewHandlers(service *service.Service) *Handlers {
+func NewHandlers(service *service.Service, baseURL string) *Handlers {
 	return &Handlers{
 		service: service,
+		baseURL: baseURL,
 	}
 }
 
@@ -47,7 +49,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("http://localhost:8080/" + encodeURL))
+	w.Write([]byte(h.baseURL + encodeURL))
 }
 
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {

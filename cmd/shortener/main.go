@@ -17,7 +17,7 @@ func main() {
 	log.Println("Service created")
 	configs := NewConfigs()
 	configs.Parse()
-	shortHandlers := handlers.NewHandlers(urlService)
+	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL)
 	log.Printf("Handlers created PORT: %s", configs.AddrServer)
 	r := chi.NewRouter()
 	r.Post("/", shortHandlers.PostURL)

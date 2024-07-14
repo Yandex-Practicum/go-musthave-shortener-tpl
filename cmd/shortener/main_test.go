@@ -40,7 +40,7 @@ func TestWebhook(t *testing.T) {
 			// вызовем хендлер как обычную функцию, без запуска самого сервера
 			storage := mapstorage.NewMapURL()
 			urlService := service.NewService(storage)
-			shortHandlers := handlers.NewHandlers(urlService)
+			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/")
 
 			switch tc.method {
 			case http.MethodPost:
