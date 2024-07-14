@@ -20,7 +20,7 @@ func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080/")
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
 
 	t.Run("Success", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -59,7 +59,7 @@ func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080/")
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
 	t.Run("Success", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
