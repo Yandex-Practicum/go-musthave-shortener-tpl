@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
@@ -18,11 +16,6 @@ func NewConfigs() *Configs {
 }
 
 func (c *Configs) Parse() {
-	//Если указана переменная окружения, то используется она.
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	c.parseFlags()
 
