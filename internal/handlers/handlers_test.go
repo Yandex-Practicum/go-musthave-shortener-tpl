@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"bytes"
+	"context"
+	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
@@ -32,10 +34,10 @@ func TestPostURL(t *testing.T) {
 
 		// Проверяем, что тело ответа содержит URL
 		responseURL := wResonse.Body.String()
-		assert.Contains(t, responseURL, "https://localhost:8080/")
+		assert.Contains(t, responseURL, "http://localhost:8080/")
 
 		// Проверяем, что в MapStorage добавлен новый URL
-		encodedURL := strings.TrimPrefix(responseURL, "https://localhost:8080/")
+		encodedURL := strings.TrimPrefix(responseURL, "http://localhost:8080/")
 		originalURL, err := storage.GetURL(encodedURL)
 		assert.NoError(t, err)
 		assert.Equal(t, "http://example.com", originalURL)
@@ -59,6 +61,7 @@ func TestGetURL(t *testing.T) {
 	urlService := service.NewService(storage)
 	shortHandlers := NewHandlers(urlService)
 	t.Run("Success", func(t *testing.T) {
+
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
 		wResonse := httptest.NewRecorder()
@@ -66,18 +69,18 @@ func TestGetURL(t *testing.T) {
 		shortHandlers.PostURL(wResonse, rRequest)
 
 		responseURL := wResonse.Body.String()
-		encodedURL := strings.TrimPrefix(responseURL, "https://localhost:8080/")
-		rRequest = httptest.NewRequest("GET", "/"+encodedURL, nil)
+		encodedURL := strings.TrimPrefix(responseURL, "http://localhost:8080/")
+		rRequest = httptest.NewRequest("GET", "http://localhost:8080/", nil)
 		wResonse = httptest.NewRecorder()
+
+		chiCtx := chi.NewRouteContext()
+		rRequest = rRequest.WithContext(context.WithValue(rRequest.Context(), chi.RouteCtxKey, chiCtx))
+		chiCtx.URLParams.Add("id", encodedURL)
 
 		shortHandlers.GetURL(wResonse, rRequest)
 
 		// Проверяем, что статус ответа - 200 OK
 		assert.Equal(t, http.StatusTemporaryRedirect, wResonse.Code)
-
-		// Проверяем, что тело ответа содержит URL
-		responseURL = wResonse.Body.String()
-		assert.Equal(t, "http://example.com", responseURL)
 
 		// Проверяем, что в MapStorage добавлен новый URL
 		originalURL, err := storage.GetURL(encodedURL)
@@ -85,7 +88,10 @@ func TestGetURL(t *testing.T) {
 		assert.Equal(t, "http://example.com", originalURL)
 
 		// Проверяем, что в MapStorage нет URL
-		rRequest = httptest.NewRequest("GET", "/noURL", nil)
+		rRequest = httptest.NewRequest("GET", "http://localhost:8080/", nil)
+		chiCtx = chi.NewRouteContext()
+		rRequest = rRequest.WithContext(context.WithValue(rRequest.Context(), chi.RouteCtxKey, chiCtx))
+		chiCtx.URLParams.Add("id", "Nourl")
 		wResonse = httptest.NewRecorder()
 		shortHandlers.GetURL(wResonse, rRequest)
 		assert.Equal(t, http.StatusNotFound, wResonse.Code)

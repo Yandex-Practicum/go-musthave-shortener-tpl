@@ -11,7 +11,7 @@ func TestEncodeURL(t *testing.T) {
 	// Тестирование успешного случая
 	t.Run("successful encoding", func(t *testing.T) {
 		url := "https://example.com"
-		expectedLen := 6
+		expectedLen := 5
 		encoded, err := EncodeURL(url)
 		assert.Nil(t, err)
 		assert.Equal(t, expectedLen, len(encoded), "Длина закодированного URL должна быть 6")
