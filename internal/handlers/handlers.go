@@ -47,12 +47,11 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("https://localhost:8080/" + encodeURL))
+	w.Write([]byte("http://localhost:8080/" + encodeURL))
 }
 
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET URL")
-
 	shortURL := chi.URLParam(r, "id")
 	log.Println(shortURL)
 	if shortURL == "" {
