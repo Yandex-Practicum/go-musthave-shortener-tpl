@@ -49,7 +49,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(h.baseURL + encodeURL))
+	w.Write([]byte(h.baseURL + "/" + encodeURL))
 }
 
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
