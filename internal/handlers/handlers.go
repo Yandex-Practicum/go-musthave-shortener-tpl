@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"io"
 	"log"
@@ -52,7 +53,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET URL")
 
-	shortURL := r.URL.String()[1:]
+	shortURL := chi.URLParam(r, "id")
 	log.Println(shortURL)
 	if shortURL == "" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
