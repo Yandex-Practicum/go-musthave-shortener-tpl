@@ -14,6 +14,7 @@ func EncodeURL(url string) (string, error) {
 		startCoder := len(base64.StdEncoding.EncodeToString([]byte(url)))
 		shortURL = base64.StdEncoding.EncodeToString([]byte(url))[startCoder-lenWord:]
 		log.Println("URL encoded successfully", shortURL)
+
 		return shortURL, nil
 	}
 

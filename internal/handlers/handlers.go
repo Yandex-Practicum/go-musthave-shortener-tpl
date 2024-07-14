@@ -66,9 +66,9 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(url)
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
-	w.Write([]byte(url))
+	//w.Write([]byte(url))
 	log.Printf("URL decoded successfully: %s", url)
 
 }
