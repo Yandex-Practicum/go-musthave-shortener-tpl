@@ -21,3 +21,9 @@ vendor/
 # IDEs directories
 .idea
 .vscode
+
+
+#air app
+.air.toml
+
+.log
