@@ -1,12 +1,11 @@
 package model
 
-
 type URL struct {
 	ID      string
 	FullURL string
 }
 
-//Фабричный метод для создания экземпляра URL структуры
+// Фабричный метод для создания экземпляра URL структуры
 func NewURL(id, full string) *URL {
 	return &URL{
 		ID:      id,
@@ -14,15 +13,14 @@ func NewURL(id, full string) *URL {
 	}
 }
 
-
-type ApiPostRequest struct {
+type APIPostRequest struct {
 	URL string `json:"url"`
 }
 
-type ApiPostResponse struct {
+type APIPostResponse struct {
 	Result string `json:"result"`
 }
 
-func NewApiPostResponse (result string) *ApiPostResponse {
-	return &ApiPostResponse{Result: result}
+func NewAPIPostResponse(result string) *APIPostResponse {
+	return &APIPostResponse{Result: result}
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//Handler для обработки Post-запроса на запись новой URL структуры в хранилище
+// Handler для обработки Post-запроса на запись новой URL структуры в хранилище
 func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		res.WriteHeader(http.StatusMethodNotAllowed)
@@ -54,7 +54,7 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 	}
 }
 
-//Handler для обработки Get-запроса на получение ссылки по ID
+// Handler для обработки Get-запроса на получение ссылки по ID
 func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
 	if req.Method != http.MethodGet {
@@ -76,9 +76,9 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-//TODO: Написать тесты
+// TODO: Написать тесты
 func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
-	var urlFromRequest model.ApiPostRequest
+	var urlFromRequest model.APIPostRequest
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&urlFromRequest); err != nil {
 		logger.Log.Debugln("error", err)
@@ -92,7 +92,7 @@ func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	db.Create(*urlToAdd)
 
 	result := config.Base + `/` + id
-	resp := model.NewApiPostResponse(result)
+	resp := model.NewAPIPostResponse(result)
 	response, err := json.Marshal(resp)
 	if err != nil {
 		logger.Log.Debugln("error", err)
