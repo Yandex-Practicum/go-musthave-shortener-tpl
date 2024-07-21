@@ -76,8 +76,8 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-
-func ApiPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
+//TODO: Написать тесты
+func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 	var urlFromRequest model.ApiPostRequest
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&urlFromRequest); err != nil {

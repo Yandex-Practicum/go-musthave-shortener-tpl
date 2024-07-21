@@ -32,15 +32,15 @@ func main() {
 		handlers.GetByIDHandler(db, res, req)
 	}
 
-	ApiPostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
-		handlers.ApiPostHandler(db, res, req)
+	APIPostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+		handlers.APIPostHandler(db, res, req)
 	}
 
 	router.Use(middleware.WithLogging)
 
 	router.Post(`/`, PostHandlerWrapper)
 	router.Get(`/{id}`, GetHandlerWrapper)
-	router.Post(`/api/shorten`, ApiPostHandlerWrapper)
+	router.Post(`/api/shorten`, APIPostHandlerWrapper)
 
 	config.ParseFlag()
 
