@@ -13,3 +13,16 @@ func NewURL(id, full string) *URL {
 		FullURL: full,
 	}
 }
+
+
+type ApiPostRequest struct {
+	URL string `json:"url"`
+}
+
+type ApiPostResponse struct {
+	Result string `json:"result"`
+}
+
+func NewApiPostResponse (result string) *ApiPostResponse {
+	return &ApiPostResponse{Result: result}
+}

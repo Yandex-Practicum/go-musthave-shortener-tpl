@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/helpers"
+	"github.com/IgorGreusunset/shortener/internal/logger"
 	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
 )
@@ -72,4 +74,33 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	//Записываем заголовок ответа
 	res.Header().Set("Location", fullURL.FullURL)
 	res.WriteHeader(http.StatusTemporaryRedirect)
+}
+
+
+func ApiPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
+	var urlFromRequest model.ApiPostRequest
+	dec := json.NewDecoder(req.Body)
+	if err := dec.Decode(&urlFromRequest); err != nil {
+		logger.Log.Debugln("error", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	id := helpers.Generate()
+
+	urlToAdd := model.NewURL(id, urlFromRequest.URL)
+	db.Create(*urlToAdd)
+
+	result := config.Base + `/` + id
+	resp := model.NewApiPostResponse(result)
+	response, err := json.Marshal(resp)
+	if err != nil {
+		logger.Log.Debugln("error", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	res.Header().Set("Content-type", "application/json")
+	res.WriteHeader(http.StatusCreated)
+	res.Write(response)
 }
