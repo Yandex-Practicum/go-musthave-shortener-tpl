@@ -7,6 +7,7 @@ import (
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/handlers"
+	"github.com/IgorGreusunset/shortener/internal/logger"
 	"github.com/IgorGreusunset/shortener/internal/middleware"
 	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
@@ -17,6 +18,8 @@ import (
 func main() {
 
 	router := chi.NewRouter()
+
+	logger.Initialize()
 
 	db := storage.NewStorage(map[string]model.URL{})
 
