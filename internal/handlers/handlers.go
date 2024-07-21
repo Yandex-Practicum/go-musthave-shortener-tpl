@@ -2,33 +2,37 @@ package handlers
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"io"
-	"log"
 	"net/http"
 )
 
 type Handlers struct {
 	service *service.Service
 	baseURL string
+	logger  *logger.Logger
 }
 
-func NewHandlers(service *service.Service, baseURL string) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
+		logger:  sLog,
 	}
 }
 
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
-	log.Println("POST URL")
 
+	// читаем запрос из body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Println(err)
+		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	// проверяем на пустой body
 	if string(body) == "" {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{
@@ -40,37 +44,35 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(string(body))
 	if err != nil {
-		log.Println(err)
+		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	// записываем статус, короткую сссылку
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(h.baseURL + "/" + encodeURL))
 }
 
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
-	log.Println("GET URL")
+
 	shortURL := chi.URLParam(r, "id")
-	log.Println(shortURL)
+
 	if shortURL == "" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
 	url, err := h.service.GetURL(shortURL)
 	if err != nil {
-		log.Println(err)
+		//h.logger.Error("Error = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	log.Println(url)
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
-	//w.Write([]byte(url))
-	log.Printf("URL decoded successfully: %s", url)
 
 }

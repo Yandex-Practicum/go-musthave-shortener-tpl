@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/go-chi/chi/v5"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
@@ -18,9 +19,10 @@ import (
 
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
+	logs := logger.NewLogger(logger.WithLevel("info"))
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
 	t.Run("Success", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -57,9 +59,10 @@ func TestPostURL(t *testing.T) {
 
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
+	logs := logger.NewLogger(logger.WithLevel("info"))
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 	t.Run("Success", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
