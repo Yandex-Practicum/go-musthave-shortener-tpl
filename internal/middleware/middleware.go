@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/IgorGreusunset/shortener/internal/compress"
 	"github.com/IgorGreusunset/shortener/internal/logger"
 )
 
@@ -61,4 +63,38 @@ func (r *loggingResponseWriter) Write(b []byte) (int, error) {
 func (r *loggingResponseWriter) WriteHeader(starusCode int) {
 	r.ResponseWriter.WriteHeader(starusCode)
 	r.responseData.status = starusCode
+}
+
+
+func GzipMiddleware(h http.Handler) http.Handler{
+	comp := func(w http.ResponseWriter, r *http.Request) {
+		ow := w
+
+		content := w.Header().Get("Content-Type")
+
+		if content == "application/json" || content == "text/html" {
+			acceptEncoding := r.Header.Get("Accept-Encoding")
+			if strings.Contains(acceptEncoding, "gzip"){
+				cw := compress.NewCompressWrite(w)
+				ow = cw
+				defer cw.Close()			
+			}
+		}
+
+		contentEncoding := r.Header.Get("Content-Encoding")
+
+		if strings.Contains(contentEncoding, "gzip") {
+			cr, err := compress.NewCompressReader(r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			r.Body = cr
+			defer cr.Close()
+		}
+
+		h.ServeHTTP(ow, r)
+	}
+
+	return http.HandlerFunc(comp)
 }

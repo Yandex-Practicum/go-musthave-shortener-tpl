@@ -37,6 +37,7 @@ func main() {
 	}
 
 	router.Use(middleware.WithLogging)
+	router.Use(middleware.GzipMiddleware)
 
 	router.Post(`/`, PostHandlerWrapper)
 	router.Get(`/{id}`, GetHandlerWrapper)
