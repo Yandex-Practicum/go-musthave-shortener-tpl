@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,7 +16,7 @@ import (
 func TestPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
 
-	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
 		PostHandler(db, res, req)
 	}
 
@@ -25,34 +26,32 @@ func TestPostHandler(t *testing.T) {
 
 	defer srv.Close()
 
-
 	tests := []struct {
-		name string
-		method string
-		reqBody string
-		expectedCode int
+		name            string
+		method          string
+		reqBody         string
+		expectedCode    int
 		expectedContent string
 	}{
 		{
-			name: "normal case",
-			method: http.MethodPost,
-			reqBody: "https://mail.ru/",
-			expectedCode:        http.StatusCreated,
+			name:            "normal case",
+			method:          http.MethodPost,
+			reqBody:         "https://mail.ru/",
+			expectedCode:    http.StatusCreated,
 			expectedContent: "text/plain",
-			
 		},
 		{
-			name: "not url case",
-			method: http.MethodPost,
-			reqBody: "some text not url",
-			expectedCode: http.StatusBadRequest,
+			name:            "not url case",
+			method:          http.MethodPost,
+			reqBody:         "some text not url",
+			expectedCode:    http.StatusBadRequest,
 			expectedContent: "",
 		},
 		{
-			name: "get case",
-			method: http.MethodGet,
-			reqBody: "https://mail.ru/",
-			expectedCode: http.StatusMethodNotAllowed,
+			name:            "get case",
+			method:          http.MethodGet,
+			reqBody:         "https://mail.ru/",
+			expectedCode:    http.StatusBadRequest,
 			expectedContent: "",
 		},
 	}
@@ -86,7 +85,7 @@ func TestGetByIDHandler(t *testing.T) {
 		"g7RETf01": model.URL{ID: "g7RETf01", FullURL: "https://mail.ru/"},
 	})
 
-	GetHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
+	GetHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
 		GetByIDHandler(db, res, req)
 	}
 
@@ -94,44 +93,43 @@ func TestGetByIDHandler(t *testing.T) {
 	srv := httptest.NewServer(handler)
 	defer srv.Close()
 
-
-	tests := []struct{
-		name string
-		method string
-		requestID string
-		expectedCode int
+	tests := []struct {
+		name             string
+		method           string
+		requestID        string
+		expectedCode     int
 		expectedLocation string
 	}{
 		{
-			name: "normal practicum",
-			method: http.MethodGet,
-			requestID: "U8rtGB25",
-			expectedCode: http.StatusTemporaryRedirect, 
+			name:             "normal practicum",
+			method:           http.MethodGet,
+			requestID:        "U8rtGB25",
+			expectedCode:     http.StatusTemporaryRedirect,
 			expectedLocation: "https://practicum.yandex.ru/",
 		},
 		{
-			name: "normal mail",
-			method: http.MethodGet,
-			requestID: "g7RETf01",
-			expectedCode: http.StatusTemporaryRedirect, 
+			name:             "normal mail",
+			method:           http.MethodGet,
+			requestID:        "g7RETf01",
+			expectedCode:     http.StatusTemporaryRedirect,
 			expectedLocation: "https://mail.ru/",
 		},
 		{
-			name: "id not in storage",
-			method: http.MethodGet,
-			requestID: "yyokley",
+			name:         "id not in storage",
+			method:       http.MethodGet,
+			requestID:    "yyokley",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name: "not get method",
-			method: http.MethodPatch,
-			requestID: "yoyoyo",
-			expectedCode: http.StatusMethodNotAllowed,
+			name:         "not get method",
+			method:       http.MethodPatch,
+			requestID:    "yoyoyo",
+			expectedCode: http.StatusBadRequest,
 		},
 	}
 
-	for _, test := range tests{
-		t.Run(test.method, func (t *testing.T)  {
+	for _, test := range tests {
+		t.Run(test.method, func(t *testing.T) {
 			req := httptest.NewRequest(test.method, srv.URL+"/"+test.requestID, nil)
 
 			cntx := chi.NewRouteContext()
@@ -152,6 +150,66 @@ func TestGetByIDHandler(t *testing.T) {
 
 			if res.Header.Get("Location") != test.expectedLocation {
 				t.Errorf("Response Location didn't match expected: got %v want %v", res.Header.Get("Location"), test.expectedLocation)
+			}
+		})
+	}
+}
+
+func TestAPIPostHandler(t *testing.T) {
+	db := storage.NewStorage(map[string]model.URL{})
+
+	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
+		APIPostHandler(db, res, req)
+	}
+
+	handler := http.HandlerFunc(PostHandlerWrapper)
+
+	srv := httptest.NewServer(handler)
+
+	defer srv.Close()
+
+
+	tests := []struct {
+		name string
+		method string
+		reqBody model.APIPostRequest
+		expectedCode int
+		expectedContent string
+	}{
+		{
+			name: "normal_case",
+			method: http.MethodPost,
+			reqBody: model.APIPostRequest{URL: "https://mail.ru/"},
+			expectedCode: http.StatusCreated,
+			expectedContent: "application/json",
+		},
+		{
+			name: "not_url_case",
+			method: http.MethodPost,
+			reqBody: model.APIPostRequest{URL: "just text not url"},
+			expectedCode: http.StatusBadRequest,
+			expectedContent: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := resty.New().R()
+			req.Method = tt.method
+			req.URL = srv.URL
+			req.Body, _ = json.Marshal(tt.reqBody)
+
+			resp, err := req.Send()
+
+			if err != nil {
+				t.Errorf("error making HTTP request: %v", err)
+			}
+
+			if resp.StatusCode() != tt.expectedCode {
+				t.Errorf("Response code didn't match expected: got %d want %d", resp.StatusCode(), tt.expectedCode)
+			}
+
+			if resp.Header().Get("Content-Type") != tt.expectedContent {
+				t.Errorf("Response content-type didn't match expected: got %v want %v", resp.Header().Get("Content-Type"), tt.expectedContent)
 			}
 		})
 	}

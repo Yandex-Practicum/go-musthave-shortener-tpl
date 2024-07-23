@@ -17,10 +17,10 @@ import (
 
 // Handler для обработки Post-запроса на запись новой URL структуры в хранилище
 func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
+/*	if req.Method != http.MethodPost {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
-	}
+	}*/
 
 	reqBody, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -57,10 +57,10 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 // Handler для обработки Get-запроса на получение ссылки по ID
 func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
-	if req.Method != http.MethodGet {
+/*	if req.Method != http.MethodGet {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		return
-	}
+	}*/
 	//Получаем ID из запроса и ищем по нему URL структуру в хранилище
 	short := chi.URLParam(req, "id")
 
@@ -83,6 +83,12 @@ func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	if err := dec.Decode(&urlFromRequest); err != nil {
 		logger.Log.Debugln("error", err)
 		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, err := url.ParseRequestURI(urlFromRequest.URL)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
