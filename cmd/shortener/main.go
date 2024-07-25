@@ -30,14 +30,13 @@ func main() {
 
 	// передаем в хенлер сервис и baseURL
 	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
-	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
+	logs.Info(fmt.Sprintf("Handlers created POчRT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get
 	r := chi.NewRouter()
 	r.Post("/", middleware.WithLogging(shortHandlers.PostURL))
+	r.Post("/api/shorten", middleware.WithLogging(shortHandlers.PostJSON))
 	r.Get("/{id}", middleware.WithLogging(shortHandlers.GetURL))
-	//r.Post("/", shortHandlers.PostURL)
-	//r.Get("/{id}", shortHandlers.GetURL)
 
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
