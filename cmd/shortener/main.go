@@ -30,7 +30,7 @@ func main() {
 
 	// передаем в хенлер сервис и baseURL
 	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
-	logs.Info(fmt.Sprintf("Handlers created POчRT: %s", configs.AddrServer))
+	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get
 	r := chi.NewRouter()
