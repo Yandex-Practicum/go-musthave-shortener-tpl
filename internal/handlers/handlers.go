@@ -41,7 +41,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
@@ -54,7 +54,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &url)
 	if err != nil {
 		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -65,10 +65,15 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resultEncodingURL := h.baseURL + "/" + encodeURL
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
 	result := struct {
 		URL string `json:"result"`
 	}{
-		URL: h.baseURL + "/" + encodeURL,
+		URL: resultEncodingURL,
 	}
 
 	err = json.NewEncoder(w).Encode(result)
@@ -80,9 +85,6 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
