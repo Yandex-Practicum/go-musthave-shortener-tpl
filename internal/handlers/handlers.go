@@ -41,7 +41,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
