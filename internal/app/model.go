@@ -1,8 +1,9 @@
 package model
 
 type URL struct {
-	ID      string
-	FullURL string
+	UUID int `json:"uuid"`
+	ID      string `json:"short_url"`
+	FullURL string	`json:"original_url"`
 }
 
 // Фабричный метод для создания экземпляра URL структуры

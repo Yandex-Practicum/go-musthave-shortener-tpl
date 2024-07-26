@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
@@ -13,15 +14,28 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//var sugar zap.SugaredLogger
 
 func main() {
+
+	config.ParseFlag()
 
 	router := chi.NewRouter()
 
 	logger.Initialize()
 
+	file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatalf("Error during opening file with shorten urls: %v", err)
+	}
+
 	db := storage.NewStorage(map[string]model.URL{})
+
+	err = db.FillFromFile(file)
+	if err != nil {
+		log.Fatalf("Error during reading from file with shorten urls: %v", err)
+	}
+
+	defer db.SaveToFile(file)
 
 	//Обертки для handlers, чтобы использовать их в роутере
 	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
@@ -42,8 +56,6 @@ func main() {
 	router.Post(`/`, PostHandlerWrapper)
 	router.Get(`/{id}`, GetHandlerWrapper)
 	router.Post(`/api/shorten`, APIPostHandlerWrapper)
-
-	config.ParseFlag()
 
 	serverAdd := config.Serv
 
