@@ -63,14 +63,22 @@ func (s *Storage) FillFromFile(file *os.File) error {
 	return nil
 }
 
-func SaveToFile (url model.URL, file string) {
+func SaveToFile (url model.URL, file string) error {
 	fil, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		return
+		return err
 	}
 	defer fil.Close()
 
-	data, _ := json.Marshal(&url)
+	data, err := json.Marshal(&url)
+	if err != nil {
+		return err
+	}
 	data = append(data, '\n')
-	fil.Write(data)
+	_, err = fil.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
