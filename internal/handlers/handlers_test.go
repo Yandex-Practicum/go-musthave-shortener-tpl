@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
@@ -14,10 +16,11 @@ import (
 
 func TestPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
-	file := "./short_url.json"
+	file, _ := os.CreateTemp("", "*")
+
 
 	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
-		PostHandler(db, file, res, req)
+		PostHandler(db, file.Name(), res, req)
 	}
 
 	handler := http.HandlerFunc(PostHandlerWrapper)
