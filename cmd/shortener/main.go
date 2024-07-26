@@ -23,7 +23,7 @@ func main() {
 
 	logger.Initialize()
 
-	file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0666)
+	file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("Error during opening file with shorten urls: %v", err)
 	}
@@ -32,14 +32,16 @@ func main() {
 
 	err = db.FillFromFile(file)
 	if err != nil {
-		log.Fatalf("Error during reading from file with shorten urls: %v", err)
+		logger.Log.Infof("Error during reading from file with shorten urls: %v", err)
 	}
 
-	defer file.Close()
+
+	file.Close()
+	
 
 	//Обертки для handlers, чтобы использовать их в роутере
 	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
-		handlers.PostHandler(db, res, req)
+		handlers.PostHandler(db, config.File, res, req)
 	}
 
 	GetHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
@@ -47,7 +49,7 @@ func main() {
 	}
 
 	APIPostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
-		handlers.APIPostHandler(db, res, req)
+		handlers.APIPostHandler(db, config.File, res, req)
 	}
 
 	router.Use(middleware.WithLogging)

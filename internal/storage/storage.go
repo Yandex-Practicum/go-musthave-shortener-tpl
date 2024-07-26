@@ -22,23 +22,20 @@ func NewStorage(db map[string]model.URL) *Storage {
 }
 
 type Repository interface {
-	Create(record model.URL)
+	Create(record *model.URL)
 	GetByID(id string) (model.URL, bool)
 }
 
 //Метод для создания новой записи в хранилище
-func (s *Storage) Create(record model.URL) {
+func (s *Storage) Create(record *model.URL) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.db[record.ID] = record
+	s.db[record.ID] = *record
 	record.UUID = len(s.db)
-
-	data, _ := json.Marshal(record)
-	s.w.Write(data)
-	s.w.WriteByte('\n')
-	s.w.Flush()	
 }
+
+
 
 //Метода для получения записи из хранилища
 func (s *Storage) GetByID(id string)(model.URL, bool) {
@@ -53,7 +50,7 @@ func (s *Storage) GetByID(id string)(model.URL, bool) {
 func (s *Storage) FillFromFile(file *os.File) error {
 	url := &model.URL{}
 	s.scan = bufio.NewScanner(file)
-	s.w = bufio.NewWriter(file)
+
 
 	for s.scan.Scan() {
 		err := json.Unmarshal(s.scan.Bytes(), url) 
@@ -66,24 +63,14 @@ func (s *Storage) FillFromFile(file *os.File) error {
 	return nil
 }
 
-/*func (s *Storage) SaveToFile(file *os.File) error {
-	file.Seek(0, 0)
-	s.w = bufio.NewWriter(file)
-
-	for _, url := range s.db {
-		data, err := json.Marshal(&url)
-		if err != nil {
-			return err
-		}
-		if _, err := s.w.Write(data); err != nil {
-			return err
-		}
-		if err := s.w.WriteByte('\n'); err != nil {
-			return err
-		}
+func SaveToFile (url model.URL, file string) {
+	fil, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		return
 	}
+	defer fil.Close()
 
-	s.w.Flush()
-	file.Close()
-	return nil
-}*/
+	data, _ := json.Marshal(&url)
+	data = append(data, '\n')
+	fil.Write(data)
+}

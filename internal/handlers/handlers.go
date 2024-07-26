@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/helpers"
@@ -16,11 +15,7 @@ import (
 )
 
 // Handler для обработки Post-запроса на запись новой URL структуры в хранилище
-func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
-/*	if req.Method != http.MethodPost {
-		res.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}*/
+func PostHandler(db storage.Repository, file string, res http.ResponseWriter, req *http.Request) {
 
 	reqBody, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -42,7 +37,9 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 
 	//Создаем новый экземпляр URL структуры и записываем его в хранилище
 	urlToAdd := model.NewURL(id, string(reqBody))
-	db.Create(*urlToAdd)
+	db.Create(urlToAdd)
+
+	storage.SaveToFile(*urlToAdd, file)
 
 	//Записываем заголовок и тело ответа
 	res.Header().Set("Content-type", "text/plain")
@@ -57,10 +54,6 @@ func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Reque
 // Handler для обработки Get-запроса на получение ссылки по ID
 func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
-/*	if req.Method != http.MethodGet {
-		res.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}*/
 	//Получаем ID из запроса и ищем по нему URL структуру в хранилище
 	short := chi.URLParam(req, "id")
 
@@ -76,8 +69,7 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// TODO: Написать тесты
-func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
+func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter, req *http.Request) {
 	var urlFromRequest model.APIPostRequest
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&urlFromRequest); err != nil {
@@ -95,7 +87,9 @@ func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	id := helpers.Generate()
 
 	urlToAdd := model.NewURL(id, urlFromRequest.URL)
-	db.Create(*urlToAdd)
+	db.Create(urlToAdd)
+
+	storage.SaveToFile(*urlToAdd, file)
 
 	result := config.Base + `/` + id
 	resp := model.NewAPIPostResponse(result)

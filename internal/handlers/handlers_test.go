@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/storage"
 	"github.com/go-chi/chi/v5"
@@ -15,9 +14,10 @@ import (
 
 func TestPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
+	file := "./short_url.json"
 
 	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
-		PostHandler(db, res, req)
+		PostHandler(db, file, res, req)
 	}
 
 	handler := http.HandlerFunc(PostHandlerWrapper)
@@ -157,9 +157,10 @@ func TestGetByIDHandler(t *testing.T) {
 
 func TestAPIPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
+	file := "./short_url.json"
 
 	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
-		APIPostHandler(db, res, req)
+		APIPostHandler(db, file, res, req)
 	}
 
 	handler := http.HandlerFunc(PostHandlerWrapper)

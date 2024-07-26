@@ -27,3 +27,4 @@ vendor/
 .air.toml
 
 .log
+.json
