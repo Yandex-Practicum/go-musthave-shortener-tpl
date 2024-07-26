@@ -33,6 +33,11 @@ func (s *Storage) Create(record model.URL) {
 
 	s.db[record.ID] = record
 	record.UUID = len(s.db)
+
+	data, _ := json.Marshal(record)
+	s.w.Write(data)
+	s.w.WriteByte('\n')
+	s.w.Flush()	
 }
 
 //Метода для получения записи из хранилища
@@ -48,6 +53,7 @@ func (s *Storage) GetByID(id string)(model.URL, bool) {
 func (s *Storage) FillFromFile(file *os.File) error {
 	url := &model.URL{}
 	s.scan = bufio.NewScanner(file)
+	s.w = bufio.NewWriter(file)
 
 	for s.scan.Scan() {
 		err := json.Unmarshal(s.scan.Bytes(), url) 
@@ -60,7 +66,7 @@ func (s *Storage) FillFromFile(file *os.File) error {
 	return nil
 }
 
-func (s *Storage) SaveToFile(file *os.File) error {
+/*func (s *Storage) SaveToFile(file *os.File) error {
 	file.Seek(0, 0)
 	s.w = bufio.NewWriter(file)
 
@@ -80,4 +86,4 @@ func (s *Storage) SaveToFile(file *os.File) error {
 	s.w.Flush()
 	file.Close()
 	return nil
-}
+}*/

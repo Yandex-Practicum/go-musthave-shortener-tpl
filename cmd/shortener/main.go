@@ -35,7 +35,7 @@ func main() {
 		log.Fatalf("Error during reading from file with shorten urls: %v", err)
 	}
 
-	defer db.SaveToFile(file)
+	defer file.Close()
 
 	//Обертки для handlers, чтобы использовать их в роутере
 	PostHandlerWrapper := func (res http.ResponseWriter, req *http.Request)  {
