@@ -72,7 +72,10 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
+//Handler для обработки json-запроса на создание новой ссылки
 func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter, req *http.Request) {
+
+	//Получаем данные для создания URL модели из запроса
 	var urlFromRequest model.APIPostRequest
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&urlFromRequest); err != nil {
@@ -81,6 +84,7 @@ func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter,
 		return
 	}
 
+	//Проверяем корректость адреса в теле запроса
 	_, err := url.ParseRequestURI(urlFromRequest.URL)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
@@ -89,13 +93,16 @@ func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter,
 
 	id := helpers.Generate()
 
+	//Создаем модель и записываем в storage
 	urlToAdd := model.NewURL(id, urlFromRequest.URL)
 	db.Create(urlToAdd)
 
+	//Дублируем запись в файл
 	if err := storage.SaveToFile(*urlToAdd, file); err != nil {
 		log.Printf("Error writing result to file: %v", err)
 	}
 
+	//Формируем и сериализируем тело ответа
 	result := config.Base + `/` + id
 	resp := model.NewAPIPostResponse(result)
 	response, err := json.Marshal(resp)
@@ -105,6 +112,7 @@ func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter,
 		return
 	}
 
+	//Записываем заголовок и тело ответа
 	res.Header().Set("Content-type", "application/json")
 	res.WriteHeader(http.StatusCreated)
 	res.Write(response)

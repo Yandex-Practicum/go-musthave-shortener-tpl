@@ -26,10 +26,13 @@ func WithLogging(h http.Handler) http.Handler {
 		uri := req.RequestURI
 		method := req.Method
 
+		//Выполняем запрос с подмененным ResponseWriter
 		h.ServeHTTP(&lw, req)
 
+		//Фиксируем время выполнения запроса
 		duration := time.Since(start)
 
+		//Записываем информацию о запросе в логгер
 		logger.Log.Infoln(
 			"uri", uri,
 			"method", method,
@@ -54,15 +57,17 @@ type (
 	}
 )
 
+//Переопределяем метод для логгирования метода ответа
 func (r *loggingResponseWriter) Write(b []byte) (int, error) {
 	size, err := r.ResponseWriter.Write(b)
 	r.responseData.size += size
 	return size, err
 }
 
-func (r *loggingResponseWriter) WriteHeader(starusCode int) {
-	r.ResponseWriter.WriteHeader(starusCode)
-	r.responseData.status = starusCode
+//Переопределяем метод для логгирования статуса ответа
+func (r *loggingResponseWriter) WriteHeader(statusCode int) {
+	r.ResponseWriter.WriteHeader(statusCode)
+	r.responseData.status = statusCode
 }
 
 
@@ -72,6 +77,7 @@ func GzipMiddleware(h http.Handler) http.Handler{
 
 		content := w.Header().Get("Content-Type")
 
+		//Проверяем формат контента и сжимаем, если контент разрешенного типа
 		if content == "application/json" || content == "text/html" {
 			acceptEncoding := r.Header.Get("Accept-Encoding")
 			if strings.Contains(acceptEncoding, "gzip"){
@@ -81,6 +87,7 @@ func GzipMiddleware(h http.Handler) http.Handler{
 			}
 		}
 
+		//Проверяем, сжато ли тело запроса и декодируем, если да
 		contentEncoding := r.Header.Get("Content-Encoding")
 
 		if strings.Contains(contentEncoding, "gzip") {

@@ -23,13 +23,17 @@ func main() {
 
 	logger.Initialize()
 
+
+	//Открываем файл-хранилище
 	file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("Error during opening file with shorten urls: %v", err)
 	}
 
+	//Создаем новое хранилище
 	db := storage.NewStorage(map[string]model.URL{})
 
+	//Наполняем хранилище данными из файла
 	err = db.FillFromFile(file)
 	if err != nil {
 		logger.Log.Infof("Error during reading from file with shorten urls: %v", err)
@@ -52,6 +56,7 @@ func main() {
 		handlers.APIPostHandler(db, config.File, res, req)
 	}
 
+	//Подключаем middlewares
 	router.Use(middleware.WithLogging)
 	router.Use(middleware.GzipMiddleware)
 
