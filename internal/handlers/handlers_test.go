@@ -6,9 +6,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -20,10 +22,18 @@ import (
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
-	pathDB := "/tmp/short_db.json"
 	storage := mapstorage.NewMapURL()
-	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
+
+	file, err := fileStorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
 	t.Run("Success", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -60,10 +70,18 @@ func TestPostURL(t *testing.T) {
 
 func TestHandlersPostJSON(t *testing.T) {
 	logs := logger.NewLogger(logger.WithLevel("info"))
-	pathDB := "/tmp/short_db.json"
 	storage := mapstorage.NewMapURL()
-	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
+
+	file, err := fileStorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
 	t.Run("test_post_JSON", func(t *testing.T) {
 		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
@@ -82,10 +100,19 @@ func TestHandlersPostJSON(t *testing.T) {
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
-	pathDB := "/tmp/short_db.json"
+
 	storage := mapstorage.NewMapURL()
-	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
+
+	file, err := fileStorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 	t.Run("Success", func(t *testing.T) {
 
 		payload := []byte("http://example.com")

@@ -4,9 +4,11 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,9 +44,18 @@ func TestWebhook(t *testing.T) {
 
 			// вызовем хендлер как обычную функцию, без запуска самого сервера
 			logs := logger.NewLogger(logger.WithLevel("info"))
+			// инициализируем файл для хранения
+			fileName := "./test.txt"
+			defer os.Remove(fileName)
+
+			file, err := fileStorage.NewSaveFile(fileName)
+			if err != nil {
+				logs.Error("Fatal", logger.ErrAttr(err))
+			}
+			defer file.Close()
 
 			storage := mapstorage.NewMapURL()
-			urlService := service.NewService(storage)
+			urlService := service.NewService(storage, file)
 			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs)
 
 			switch tc.method {
