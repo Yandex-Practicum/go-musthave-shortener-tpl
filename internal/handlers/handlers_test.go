@@ -57,6 +57,26 @@ func TestPostURL(t *testing.T) {
 	})
 }
 
+func TestHandlersPostJSON(t *testing.T) {
+	logs := logger.NewLogger(logger.WithLevel("info"))
+	storage := mapstorage.NewMapURL()
+	urlService := service.NewService(storage)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+
+	t.Run("test_post_JSON", func(t *testing.T) {
+		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
+		param := strings.NewReader(payload)
+		rRequest := httptest.NewRequest("POST", "/url", param)
+		wResonse := httptest.NewRecorder()
+
+		shortHandlers.PostJSON(wResonse, rRequest)
+
+		// Проверяем, что статус ответа - 201 Created
+		assert.Equal(t, http.StatusCreated, wResonse.Code)
+
+	})
+}
+
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
