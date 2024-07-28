@@ -42,6 +42,7 @@ func TestWebhook(t *testing.T) {
 
 			// вызовем хендлер как обычную функцию, без запуска самого сервера
 			logs := logger.NewLogger(logger.WithLevel("info"))
+
 			storage := mapstorage.NewMapURL()
 			urlService := service.NewService(storage)
 			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs)

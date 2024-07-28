@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 	"log"
 )
@@ -19,6 +20,29 @@ func (s *Service) SaveURL(url string) (string, error) {
 		log.Println(err)
 		return "", err
 	}
+	err = s.inJSON(url, encodeURL)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
 
 	return encodeURL, nil
+}
+
+func (s *Service) inJSON(URL, shotrURL string) error {
+	fileStorage.Count++
+	var events = []*fileStorage.Event{
+		{
+			Uuid:        fileStorage.Count,
+			ShortURL:    shotrURL,
+			OriginalURL: URL,
+		},
+	}
+
+	for _, event := range events {
+		if err := s.dbFile.WriteSaveModel(event); err != nil {
+			return err
+		}
+	}
+	return nil
 }

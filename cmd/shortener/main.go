@@ -7,6 +7,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 )
@@ -24,8 +25,15 @@ func main() {
 	storage := mapstorage.NewMapURL()
 	logs.Info("Storage created")
 
+	// инициализируем файл для хранения
+	file, err := fileStorage.NewSaveFile(configs.flagPathDB)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+
 	// передаем в сервис хранилище
-	urlService := service.NewService(storage)
+	urlService := service.NewService(storage, file)
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL

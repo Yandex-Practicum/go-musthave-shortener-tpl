@@ -9,6 +9,7 @@ type Configs struct {
 	AddrServer   string
 	BaseURL      string
 	flagLogLevel string
+	flagPathDB   string
 }
 
 func NewConfigs() *Configs {
@@ -30,7 +31,9 @@ func (c *Configs) Parse() {
 	if envLogLevel := os.Getenv("LOG_LEVEL"); envLogLevel != "" {
 		c.flagLogLevel = envLogLevel
 	}
-
+	if envPathDB := os.Getenv("FILE_STORAGE_PATH"); envPathDB != "" {
+		c.flagPathDB = envPathDB
+	}
 }
 
 func (c *Configs) parseFlags() {
@@ -39,6 +42,8 @@ func (c *Configs) parseFlags() {
 	//Флаг -b отвечает за базовый адрес результирующего сокращённого URL (значение: адрес сервера перед коротким URL,
 	//например http://localhost:8080/qsd54gFg).
 	flag.StringVar(&c.BaseURL, "b", "http://localhost:8080", "Result net address host:port")
+	//Флаг -f отвечает за базовый путь сохранения storage
+	flag.StringVar(&c.flagPathDB, "f", "./exampl.txt", "full name for file repository")
 
 	flag.StringVar(&c.flagLogLevel, "l", "info", "log level")
 	flag.Parse()

@@ -20,9 +20,10 @@ import (
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
+	pathDB := "/tmp/short_db.json"
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
 
 	t.Run("Success", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -59,9 +60,10 @@ func TestPostURL(t *testing.T) {
 
 func TestHandlersPostJSON(t *testing.T) {
 	logs := logger.NewLogger(logger.WithLevel("info"))
+	pathDB := "/tmp/short_db.json"
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
 
 	t.Run("test_post_JSON", func(t *testing.T) {
 		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
@@ -80,9 +82,10 @@ func TestHandlersPostJSON(t *testing.T) {
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
+	pathDB := "/tmp/short_db.json"
 	storage := mapstorage.NewMapURL()
 	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, pathDB)
 	t.Run("Success", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
