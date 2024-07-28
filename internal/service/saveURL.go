@@ -33,7 +33,7 @@ func (s *Service) inJSON(URL, shotrURL string) error {
 	filestorage.Count++
 	var events = []*filestorage.Event{
 		{
-			Uuid:        filestorage.Count,
+			UUID:        filestorage.Count,
 			ShortURL:    shotrURL,
 			OriginalURL: URL,
 		},
