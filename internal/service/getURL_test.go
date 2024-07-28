@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -16,7 +16,7 @@ func TestGetURL(t *testing.T) {
 	fileName := "./test.txt"
 	defer os.Remove(fileName)
 
-	file, err := fileStorage.NewSaveFile(fileName)
+	file, err := filestorage.NewSaveFile(fileName)
 	if err != nil {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}

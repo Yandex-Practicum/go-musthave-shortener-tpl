@@ -1,4 +1,4 @@
-package fileStorage
+package filestorage
 
 import (
 	"bufio"
@@ -9,7 +9,7 @@ import (
 var Count int
 
 type Event struct {
-	Uuid        int    `json:"uuid"`
+	UUID        int    `json:"uuid"`
 	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 }

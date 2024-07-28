@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/fileStorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 	"log"
 )
@@ -30,10 +30,10 @@ func (s *Service) SaveURL(url string) (string, error) {
 }
 
 func (s *Service) inJSON(URL, shotrURL string) error {
-	fileStorage.Count++
-	var events = []*fileStorage.Event{
+	filestorage.Count++
+	var events = []*filestorage.Event{
 		{
-			Uuid:        fileStorage.Count,
+			Uuid:        filestorage.Count,
 			ShortURL:    shotrURL,
 			OriginalURL: URL,
 		},
