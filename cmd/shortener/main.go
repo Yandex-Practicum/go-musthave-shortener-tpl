@@ -34,9 +34,9 @@ func main() {
 
 	// инициализировали роутер и создали Post и Get
 	r := chi.NewRouter()
-	r.Post("/", middleware.WithLogging(shortHandlers.PostURL))
-	r.Post("/api/shorten", middleware.WithLogging(shortHandlers.PostJSON))
-	r.Get("/{id}", middleware.WithLogging(shortHandlers.GetURL))
+	r.Post("/", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostURL)))
+	r.Post("/api/shorten", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostJSON)))
+	r.Get("/{id}", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.GetURL)))
 
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {

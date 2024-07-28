@@ -28,9 +28,11 @@ func TestWebhook(t *testing.T) {
 		expectedBody string
 	}{
 		{method: http.MethodGet, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
+		{method: http.MethodPost, expectedCode: http.StatusOK, expectedBody: successBody},
+
+		// Данные методы еще не реализованы.
 		//{method: http.MethodPut, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
 		//{method: http.MethodDelete, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
-		{method: http.MethodPost, expectedCode: http.StatusOK, expectedBody: successBody},
 	}
 
 	for _, tc := range testCases {
