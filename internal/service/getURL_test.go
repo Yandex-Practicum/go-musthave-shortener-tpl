@@ -22,7 +22,7 @@ func TestGetURL(t *testing.T) {
 	}
 	defer file.Close()
 	service := NewService(storageURL, file)
-	t.Run("get URL", func(t *testing.T) {
+	t.Run("get_URL", func(t *testing.T) {
 		url, err := service.GetURL("")
 		assert.NotNil(t, err)
 		assert.Equal(t, "", url)

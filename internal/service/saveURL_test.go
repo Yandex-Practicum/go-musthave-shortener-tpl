@@ -23,7 +23,7 @@ func TestService_SaveURL(t *testing.T) {
 	defer file.Close()
 	service := NewService(storageURL, file)
 
-	t.Run("save URL", func(t *testing.T) {
+	t.Run("save_URL", func(t *testing.T) {
 		_, err := service.SaveURL("")
 		assert.NotNil(t, err)
 		assert.Equal(t, "URL is empty", err.Error())

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"io"
 	"log"
@@ -25,9 +26,9 @@ func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) 
 }
 
 func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
-	url := struct {
-		URL string `json:"url"`
-	}{
+
+	// создаем структуру для сохранения URL
+	url := models.URL{
 		URL: "",
 	}
 
@@ -141,19 +142,4 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
-}
-
-func (h *Handlers) resultBody(body string, w http.ResponseWriter) {
-	// создаем короткую ссылку
-	encodeURL, err := h.service.SaveURL(body)
-	if err != nil {
-		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// записываем статус, короткую сссылку
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(h.baseURL + "/" + encodeURL))
 }

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 	"log"
@@ -12,7 +11,7 @@ func (s *Service) SaveURL(url string) (string, error) {
 
 	if err != nil {
 		log.Println(err)
-		return "", errors.New("URL is empty")
+		return "", err
 	}
 
 	err = s.storage.SaveURL(encodeURL, url)

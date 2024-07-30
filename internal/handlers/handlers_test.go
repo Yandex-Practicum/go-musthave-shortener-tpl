@@ -35,7 +35,7 @@ func TestPostURL(t *testing.T) {
 	urlService := service.NewService(storage, file)
 	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("test_post_URL", func(t *testing.T) {
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
 		wResonse := httptest.NewRecorder()
@@ -57,7 +57,7 @@ func TestPostURL(t *testing.T) {
 	})
 
 	//Тест на обработку пустого тела запроса
-	t.Run("EmptyRequestBody", func(t *testing.T) {
+	t.Run("empty_request_body", func(t *testing.T) {
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer([]byte("")))
 		wResonse := httptest.NewRecorder()
 
@@ -113,7 +113,7 @@ func TestGetURL(t *testing.T) {
 	defer file.Close()
 	urlService := service.NewService(storage, file)
 	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
-	t.Run("Success", func(t *testing.T) {
+	t.Run("test_get_URL", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
