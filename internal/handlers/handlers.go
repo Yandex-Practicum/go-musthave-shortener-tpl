@@ -74,7 +74,9 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	result := models.URL{
+	result := struct {
+		URL string `json:"result"`
+	}{
 		URL: resultEncodingURL,
 	}
 
