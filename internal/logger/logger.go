@@ -6,45 +6,6 @@ import (
 	"os"
 )
 
-//
-//func Initialize(level string) error {
-//	slogLevel, err := purseLevel(level)
-//	if err != nil {
-//		return err
-//	}
-//
-//	// указываем параметры
-//	opts := &slog.HandlerOptions{
-//		Level: slogLevel,
-//	}
-//
-//	// указываем тип хендлера - вывод + параметры
-//	handler := slog.NewJSONHandler(os.Stdout, opts)
-//
-//	// создаем новый логер
-//	logger := slog.New(handler)
-//
-//	// делаем его логером по умолчанию
-//	slog.SetDefault(logger)
-//	return nil
-//}
-//
-//func purseLevel(level string) (slog.Level, error) {
-//	level = strings.ToLower(level)
-//	switch level {
-//	case "debug":
-//		return slog.LevelDebug, nil
-//	case "info":
-//		return slog.LevelInfo, nil
-//	case "warn":
-//		return slog.LevelWarn, nil
-//	case "error":
-//		return slog.LevelError, nil
-//	default:
-//		return slog.Level(999), errors.New("Bad flag Log Level")
-//	}
-//}
-
 const (
 	defaultLevel      = LevelInfo
 	defaultAddSource  = false

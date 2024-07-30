@@ -7,7 +7,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -52,6 +51,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Записываем в пустую структуру полученный запрос
 	err = json.Unmarshal(body, &url)
 	if err != nil {
 		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
@@ -59,6 +59,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(url.URL)
 	if err != nil {
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
@@ -66,14 +67,14 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// создаем корректную ссылку
 	resultEncodingURL := h.baseURL + "/" + encodeURL
 
+	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	result := struct {
-		URL string `json:"result"`
-	}{
+	result := models.URL{
 		URL: resultEncodingURL,
 	}
 
@@ -118,27 +119,35 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// записываем статус, короткую сссылку
+	// создаем корректную ссылку
+	resultEncodingURL := h.baseURL + "/" + encodeURL
+
+	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(h.baseURL + "/" + encodeURL))
+	w.Write([]byte(resultEncodingURL))
 }
 
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
+	// читаем запрос по ключу
 	shortURL := chi.URLParam(r, "id")
 
+	//проверяем на пустой запрос
 	if shortURL == "" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+
+	//ищем в мапе сохраненный url
 	url, err := h.service.GetURL(shortURL)
 	if err != nil {
 		h.logger.Error("Error = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	log.Println(url)
+
+	// записываем заголовок и статус
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
