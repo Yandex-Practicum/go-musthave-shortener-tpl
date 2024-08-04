@@ -96,8 +96,8 @@ func GzipMiddleware(h http.Handler) http.Handler{
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			r.Body = cr
 			defer cr.Close()
+			r.Body = cr
 		}
 
 		h.ServeHTTP(ow, r)

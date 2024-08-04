@@ -37,21 +37,21 @@ func TestPostHandler(t *testing.T) {
 		expectedContent string
 	}{
 		{
-			name:            "normal case",
+			name:            "normal_case",
 			method:          http.MethodPost,
 			reqBody:         "https://mail.ru/",
 			expectedCode:    http.StatusCreated,
 			expectedContent: "text/plain",
 		},
 		{
-			name:            "not url case",
+			name:            "not_url_case",
 			method:          http.MethodPost,
 			reqBody:         "some text not url",
 			expectedCode:    http.StatusBadRequest,
 			expectedContent: "",
 		},
 		{
-			name:            "get case",
+			name:            "get_case",
 			method:          http.MethodGet,
 			reqBody:         "https://mail.ru/",
 			expectedCode:    http.StatusBadRequest,
@@ -104,27 +104,27 @@ func TestGetByIDHandler(t *testing.T) {
 		expectedLocation string
 	}{
 		{
-			name:             "normal practicum",
+			name:             "normal_practicum",
 			method:           http.MethodGet,
 			requestID:        "U8rtGB25",
 			expectedCode:     http.StatusTemporaryRedirect,
 			expectedLocation: "https://practicum.yandex.ru/",
 		},
 		{
-			name:             "normal mail",
+			name:             "normal_mail",
 			method:           http.MethodGet,
 			requestID:        "g7RETf01",
 			expectedCode:     http.StatusTemporaryRedirect,
 			expectedLocation: "https://mail.ru/",
 		},
 		{
-			name:         "id not in storage",
+			name:         "id_not_in_storage",
 			method:       http.MethodGet,
 			requestID:    "yyokley",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "not get method",
+			name:         "not_get_method",
 			method:       http.MethodPatch,
 			requestID:    "yoyoyo",
 			expectedCode: http.StatusBadRequest,

@@ -32,6 +32,7 @@ func main() {
 
 	//Создаем новое хранилище
 	db := storage.NewStorage(map[string]model.URL{})
+	db.SetFile(file)
 
 	//Наполняем хранилище данными из файла
 	err = db.FillFromFile(file)

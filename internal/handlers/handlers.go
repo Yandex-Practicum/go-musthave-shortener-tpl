@@ -39,11 +39,6 @@ func PostHandler(db storage.Repository, file string, res http.ResponseWriter, re
 	urlToAdd := model.NewURL(id, string(reqBody))
 	db.Create(urlToAdd)
 
-	if err := storage.SaveToFile(*urlToAdd, file); err != nil {
-		log.Printf("Error write to file: %v", err)
-		return
-	}
-
 	//Записываем заголовок и тело ответа
 	res.Header().Set("Content-type", "text/plain")
 	res.WriteHeader(http.StatusCreated)
@@ -96,11 +91,6 @@ func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter,
 	//Создаем модель и записываем в storage
 	urlToAdd := model.NewURL(id, urlFromRequest.URL)
 	db.Create(urlToAdd)
-
-	//Дублируем запись в файл
-	if err := storage.SaveToFile(*urlToAdd, file); err != nil {
-		log.Printf("Error writing result to file: %v", err)
-	}
 
 	//Формируем и сериализируем тело ответа
 	result := config.Base + `/` + id

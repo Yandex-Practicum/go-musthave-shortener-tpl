@@ -3,6 +3,7 @@ package storage
 import (
 	"bufio"
 	"encoding/json"
+	"log"
 	"os"
 	"sync"
 
@@ -11,6 +12,7 @@ import (
 
 type Storage struct {
 	db map[string]model.URL
+	file *os.File
 	mu sync.RWMutex
 	w *bufio.Writer
 	scan *bufio.Scanner
@@ -19,6 +21,10 @@ type Storage struct {
 //Фабричный метод создания нового экземпляра хранилища
 func NewStorage(db map[string]model.URL) *Storage {
 	return &Storage{db: db}
+}
+
+func (s *Storage) SetFile(f *os.File) {
+	s.file = f
 }
 
 type Repository interface {
@@ -33,14 +39,22 @@ func (s *Storage) Create(record *model.URL) {
 
 	s.db[record.ID] = *record
 	record.UUID = len(s.db)
+
+	if s.file != nil {
+		name := s.file.Name()
+		if err := saveToFile(*record, name); err != nil {
+			log.Printf("Error write to file: %v", err)
+			return
+		}
+	}
 }
 
 
 
 //Метода для получения записи из хранилища
 func (s *Storage) GetByID(id string)(model.URL, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	url, ok := s.db[id]
 	return url, ok
@@ -63,7 +77,7 @@ func (s *Storage) FillFromFile(file *os.File) error {
 	return nil
 }
 
-func SaveToFile (url model.URL, file string) error {
+func saveToFile (url model.URL, file string) error {
 	fil, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		return err
