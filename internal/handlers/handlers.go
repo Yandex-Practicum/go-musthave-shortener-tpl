@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+
 	"github.com/IgorGreusunset/shortener/cmd/config"
 	model "github.com/IgorGreusunset/shortener/internal/app"
 	"github.com/IgorGreusunset/shortener/internal/helpers"
@@ -15,7 +17,7 @@ import (
 )
 
 // Handler для обработки Post-запроса на запись новой URL структуры в хранилище
-func PostHandler(db storage.Repository, file string, res http.ResponseWriter, req *http.Request) {
+func PostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
 	reqBody, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -68,7 +70,7 @@ func GetByIDHandler(db storage.Repository, res http.ResponseWriter, req *http.Re
 }
 
 //Handler для обработки json-запроса на создание новой ссылки
-func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter, req *http.Request) {
+func APIPostHandler(db storage.Repository, res http.ResponseWriter, req *http.Request) {
 
 	//Получаем данные для создания URL модели из запроса
 	var urlFromRequest model.APIPostRequest
@@ -106,4 +108,13 @@ func APIPostHandler(db storage.Repository, file string, res http.ResponseWriter,
 	res.Header().Set("Content-type", "application/json")
 	res.WriteHeader(http.StatusCreated)
 	res.Write(response)
+}
+
+func PingHandler(db *sql.DB, res http.ResponseWriter, req *http.Request) {
+	err := db.Ping()
+	if err == nil {
+		res.WriteHeader(http.StatusOK)
+	} else {
+		res.WriteHeader(http.StatusInternalServerError)
+	}
 }

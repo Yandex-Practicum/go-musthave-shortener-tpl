@@ -17,10 +17,11 @@ import (
 func TestPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
 	file, _ := os.CreateTemp("", "*")
+	db.SetFile(file)
 
 
 	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
-		PostHandler(db, file.Name(), res, req)
+		PostHandler(db, res, req)
 	}
 
 	handler := http.HandlerFunc(PostHandlerWrapper)
@@ -160,10 +161,11 @@ func TestGetByIDHandler(t *testing.T) {
 
 func TestAPIPostHandler(t *testing.T) {
 	db := storage.NewStorage(map[string]model.URL{})
-	file := "./short_url.json"
+	file, _ := os.CreateTemp("", "*")
+	db.SetFile(file)
 
 	PostHandlerWrapper := func(res http.ResponseWriter, req *http.Request) {
-		APIPostHandler(db, file, res, req)
+		APIPostHandler(db, res, req)
 	}
 
 	handler := http.HandlerFunc(PostHandlerWrapper)
