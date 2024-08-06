@@ -4,6 +4,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
@@ -39,6 +40,9 @@ func TestWebhook(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing_"+tc.method, func(t *testing.T) {
+			// создаём connect
+			dsm, _ := db.NewPstStorage("")
+
 			r := httptest.NewRequest(tc.method, "/", nil)
 			w := httptest.NewRecorder()
 
@@ -56,7 +60,7 @@ func TestWebhook(t *testing.T) {
 
 			storage := mapstorage.NewMapURL()
 			urlService := service.NewService(storage, file)
-			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs)
+			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs, dsm)
 
 			switch tc.method {
 			case http.MethodPost:

@@ -1,23 +1,43 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+	_ "github.com/jackc/pgx/v5/stdlib"
+)
 
-type DB struct {
-	DB *sql.DB
+type PsqlStorage interface {
+	initDB(dataSourceName string) error
+	Ping() error
+	Close() error
 }
 
-// GetDB возвращает экземпляр базы данных
-func NewDB() *DB {
-	return &DB{}
+type PstStorage struct {
+	storage *sql.DB
+}
+
+func NewPstStorage(dataSourceName string) (*PstStorage, error) {
+	p := &PstStorage{}
+	err := p.initDB(dataSourceName)
+	return p, err
 }
 
 // InitDB инициализирует подключение к базе данных
-func InitDB(dataSourceName string) error {
+func (p *PstStorage) initDB(dataSourceName string) error {
 	db, err := sql.Open("pgx", dataSourceName)
 	if err != nil {
 		return err
 	}
+	p.storage = db
+	fmt.Println(dataSourceName)
+	fmt.Println(db)
+	return nil
+}
 
-	defer db.Close()
-	return err
+func (p *PstStorage) Ping() error {
+	return p.storage.Ping()
+}
+
+func (p *PstStorage) Close() error {
+	return p.storage.Close()
 }

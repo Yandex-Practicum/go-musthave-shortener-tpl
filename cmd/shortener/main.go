@@ -7,6 +7,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
@@ -18,15 +19,25 @@ func main() {
 	configs.Parse()
 
 	// инициализируем logger
-	logs := logger.NewLogger(logger.WithLevel(configs.flagLogLevel))
+	logs := logger.NewLogger(logger.WithLevel(configs.LogLevel))
 	logs.Info("Start logger")
+
+	// подключаемся к базе
+	dataSourceName := configs.AddrDB
+	dbPsql, err := db.NewPstStorage(dataSourceName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	logs.Info("Connecting DB")
+
+	defer dbPsql.Close()
 
 	// инициализируем хранилище
 	storage := mapstorage.NewMapURL()
 	logs.Info("Storage created")
 
 	// инициализируем файл для хранения
-	file, err := filestorage.NewSaveFile(configs.flagPathDB)
+	file, err := filestorage.NewSaveFile(configs.PathDB)
 	if err != nil {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
@@ -37,7 +48,7 @@ func main() {
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL
-	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
+	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs, dbPsql)
 	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get
@@ -45,6 +56,7 @@ func main() {
 	r.Post("/", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostURL)))
 	r.Post("/api/shorten", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostJSON)))
 	r.Get("/{id}", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.GetURL)))
+	r.Get("/ping", middleware.WithLogging(shortHandlers.GetPing))
 
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {

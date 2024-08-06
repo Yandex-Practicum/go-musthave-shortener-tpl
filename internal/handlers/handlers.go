@@ -6,6 +6,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"io"
 	"net/http"
 )
@@ -14,13 +15,15 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
+	db      *db.PstStorage
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, db *db.PstStorage) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
 		logger:  sLog,
+		db:      db,
 	}
 }
 
@@ -151,4 +154,14 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
+}
+
+func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
+	if err := h.db.Ping(); err != nil {
+		h.logger.Error("Error = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
 }

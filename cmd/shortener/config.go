@@ -6,10 +6,11 @@ import (
 )
 
 type Configs struct {
-	AddrServer   string
-	BaseURL      string
-	flagLogLevel string
-	flagPathDB   string
+	AddrServer string
+	BaseURL    string
+	LogLevel   string
+	PathDB     string
+	AddrDB     string
 }
 
 func NewConfigs() *Configs {
@@ -29,10 +30,14 @@ func (c *Configs) Parse() {
 		c.BaseURL = baseURL
 	}
 	if envLogLevel := os.Getenv("LOG_LEVEL"); envLogLevel != "" {
-		c.flagLogLevel = envLogLevel
+		c.LogLevel = envLogLevel
 	}
 	if envPathDB := os.Getenv("FILE_STORAGE_PATH"); envPathDB != "" {
-		c.flagPathDB = envPathDB
+		c.PathDB = envPathDB
+	}
+
+	if envAddrDB := os.Getenv("DATABASE_DSN"); envAddrDB != "" {
+		c.AddrDB = envAddrDB
 	}
 }
 
@@ -43,8 +48,11 @@ func (c *Configs) parseFlags() {
 	//например http://localhost:8080/qsd54gFg).
 	flag.StringVar(&c.BaseURL, "b", "http://localhost:8080", "Result net address host:port")
 	//Флаг -f отвечает за базовый путь сохранения storage
-	flag.StringVar(&c.flagPathDB, "f", "./exampl.txt", "full name for file repository")
+	flag.StringVar(&c.PathDB, "f", "./exampl.txt", "full name for file repository")
 
-	flag.StringVar(&c.flagLogLevel, "l", "info", "log level")
+	flag.StringVar(&c.LogLevel, "l", "info", "log level")
+
+	//Флаг -p отвечает за адрес подключения DB
+	flag.StringVar(&c.AddrDB, "d", "", "address DB")
 	flag.Parse()
 }

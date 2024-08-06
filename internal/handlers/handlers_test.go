@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
@@ -20,6 +21,9 @@ import (
 // Предполагаем, что функция EncodeURL и переменная MapStorage уже определены в вашем пакете
 
 func TestPostURL(t *testing.T) {
+	// создаём connect
+	dsm, _ := db.NewPstStorage("")
+
 	// Тест на успешное кодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
 	storage := mapstorage.NewMapURL()
@@ -33,7 +37,7 @@ func TestPostURL(t *testing.T) {
 	}
 	defer file.Close()
 	urlService := service.NewService(storage, file)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, dsm)
 
 	t.Run("test_post_URL", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -69,6 +73,9 @@ func TestPostURL(t *testing.T) {
 }
 
 func TestHandlersPostJSON(t *testing.T) {
+	// создаём connect
+	dsm, _ := db.NewPstStorage("")
+
 	logs := logger.NewLogger(logger.WithLevel("info"))
 	storage := mapstorage.NewMapURL()
 	// инициализируем файл для хранения
@@ -81,7 +88,7 @@ func TestHandlersPostJSON(t *testing.T) {
 	}
 	defer file.Close()
 	urlService := service.NewService(storage, file)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, dsm)
 
 	t.Run("test_post_JSON", func(t *testing.T) {
 		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
@@ -98,6 +105,9 @@ func TestHandlersPostJSON(t *testing.T) {
 }
 
 func TestGetURL(t *testing.T) {
+	// создаём connect
+	dsm, _ := db.NewPstStorage("")
+
 	// Тест на успешное декодирование URL
 	logs := logger.NewLogger(logger.WithLevel("info"))
 
@@ -112,7 +122,7 @@ func TestGetURL(t *testing.T) {
 	}
 	defer file.Close()
 	urlService := service.NewService(storage, file)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, dsm)
 	t.Run("test_get_URL", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
