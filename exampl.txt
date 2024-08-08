@@ -1,2 +1,11 @@
 {"uuid":1,"short_url":"UqYex","original_url":"https://practicum.yandex1.ru"}
 {"uuid":2,"short_url":"Hbxaf","original_url":"https://practicum.yandex1.ru"}
+{"uuid":3,"short_url":"lOQAM","original_url":"{\n    \"url\" : \"https://ya.ru\"\n}"}
+{"uuid":4,"short_url":"JHDBH","original_url":"{\n    \"url\" : \"https://youtube.ru\"\n}"}
+{"uuid":5,"short_url":"dWJKs","original_url":"{\n    \"url\" : \"https://vk.com/feed\"\n}"}
+{"uuid":6,"short_url":"VzVqq","original_url":"{\n    \"url\" : \"https://vk.com\"\n}"}
+{"uuid":7,"short_url":"EHopo","original_url":"{\n    \"url\" : \"https://ya.ru\"\n}"}
+{"uuid":8,"short_url":"Tapob","original_url":"{\n    \"url\" : \"https://ya.ru\"\n}"}
+{"uuid":9,"short_url":"MJRnZ","original_url":"{\n    \"url\" : \"https://ya.ru\"\n}"}
+{"uuid":10,"short_url":"yqJao","original_url":"https://ya.ru"}
+{"uuid":11,"short_url":"olixs","original_url":"https://ya.ru"}

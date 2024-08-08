@@ -15,15 +15,13 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
-	db      *db.PstStorage
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, db *db.PstStorage) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
 		logger:  sLog,
-		db:      db,
 	}
 }
 
@@ -157,7 +155,8 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
-	if err := h.db.Ping(); err != nil {
+	var checkPing *db.PstStorage
+	if err := checkPing.Ping(); err != nil {
 		h.logger.Error("Error = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return

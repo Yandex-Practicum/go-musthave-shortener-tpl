@@ -7,9 +7,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 )
 
@@ -23,18 +21,19 @@ func main() {
 	logs.Info("Start logger")
 
 	// подключаемся к базе
-	dataSourceName := configs.AddrDB
-	dbPsql, err := db.NewPstStorage(dataSourceName)
-	if err != nil {
-		logs.Error("Fatal", logger.ErrAttr(err))
-	}
-	logs.Info("Connecting DB")
+	//dataSourceName := configs.AddrDB
+	//dbPsql, err := db.NewPstStorage(dataSourceName)
+	//if err != nil {
+	//	logs.Error("Fatal", logger.ErrAttr(err))
+	//}
 
+	dbPsql := configs.repository
+	logs.Info("Connecting DB", dbPsql)
 	defer dbPsql.Close()
 
 	// инициализируем хранилище
-	storage := mapstorage.NewMapURL()
-	logs.Info("Storage created")
+	//storage := mapstorage.NewMapURL()
+	//logs.Info("Storage created")
 
 	// инициализируем файл для хранения
 	file, err := filestorage.NewSaveFile(configs.PathDB)
@@ -44,11 +43,11 @@ func main() {
 	defer file.Close()
 
 	// передаем в сервис хранилище
-	urlService := service.NewService(storage, file)
+	urlService := service.NewService(dbPsql, file)
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL
-	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs, dbPsql)
+	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
 	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get

@@ -35,3 +35,7 @@ func (s *MapStorage) GetURL(shortURL string) (string, error) {
 	}
 	return s.storage[shortURL], nil
 }
+
+func (s *MapStorage) Close() error {
+	return nil
+}

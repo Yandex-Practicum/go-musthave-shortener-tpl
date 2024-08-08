@@ -22,7 +22,7 @@ func NewPstStorage(dataSourceName string) (*PstStorage, error) {
 	return p, err
 }
 
-// InitDB инициализирует подключение к базе данных
+// InitDB инициализирует подключение к базе данных и создаем базу
 func (p *PstStorage) initDB(dataSourceName string) error {
 	db, err := sql.Open("pgx", dataSourceName)
 	if err != nil {
@@ -31,6 +31,26 @@ func (p *PstStorage) initDB(dataSourceName string) error {
 	p.storage = db
 	fmt.Println(dataSourceName)
 	fmt.Println(db)
+
+	err = p.CreateTableIfNotExists()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Функция для создания таблицы, если она не существует
+func (p *PstStorage) CreateTableIfNotExists() error {
+	query := `
+    CREATE TABLE IF NOT EXISTS urls (
+        id SERIAL PRIMARY KEY,
+        originalURL TEXT NOT NULL,
+        shortURL TEXT NOT NULL
+    );`
+	_, err := p.storage.Exec(query)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
