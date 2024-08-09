@@ -11,13 +11,13 @@ import (
 )
 
 type Configs struct {
-	AddrServer string                `json:"addrServer,omitempty" :"addrServer"`
-	BaseURL    string                `json:"baseURL,omitempty" :"baseURL"`
-	LogLevel   string                `json:"logLevel,omitempty" :"logLevel"`
-	PathDB     string                `json:"pathDB,omitempty" :"pathDB"`
-	File       *filestorage.SaveFile `json:",omitempty" :"file"`
-	AddrDB     string                `json:"addrDB,omitempty" :"addrDB"`
-	repository service.Storage       `json:"repository,omitempty" :"repository"`
+	AddrServer string
+	BaseURL    string
+	LogLevel   string
+	PathDB     string
+	File       *filestorage.SaveFile
+	AddrDB     string
+	repository service.Storage
 }
 
 func NewConfigs() *Configs {
