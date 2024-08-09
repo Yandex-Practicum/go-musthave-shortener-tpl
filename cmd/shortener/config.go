@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"os"
 )
@@ -15,7 +14,6 @@ type Configs struct {
 	BaseURL    string
 	LogLevel   string
 	PathDB     string
-	File       *filestorage.SaveFile
 	AddrDB     string
 	repository service.Storage
 }
@@ -38,6 +36,10 @@ func (c *Configs) Parse() {
 	}
 	if envLogLevel := os.Getenv("LOG_LEVEL"); envLogLevel != "" {
 		c.LogLevel = envLogLevel
+	}
+
+	if pathFile := os.Getenv("FILE_STORAGE_PATH"); pathFile != "" {
+		c.PathDB = pathFile
 	}
 
 	// Проверка переменной окружения DATABASE_DSN
