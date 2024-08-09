@@ -60,34 +60,6 @@ func (c *Configs) Parse() {
 		c.repository = mapstorage.NewMapURL()
 	}
 
-	//else if c.PathDB != "" {
-	//	// Проверка переменной окружения для хранения в файле
-	//	if envPathDB := os.Getenv("FILE_STORAGE_PATH"); envPathDB != "" {
-	//		c.PathDB = envPathDB
-	//	}
-
-	//if c.PathDB != "" {
-	//	// Хранение в файле
-	//	fmt.Println("Using file storage with path:", c.PathDB)
-	//	// Инициализация и работа с файлом
-	//	c.File, err = filestorage.NewSaveFile(c.PathDB)
-	//	if err != nil {
-	//		fmt.Println("Fatal: ", err)
-	//	}
-	//} else {
-	//	// Хранение в памяти
-	//	fmt.Println("Using in-memory storage")
-	//	// Инициализация хранения в памяти
-	//	c.repository = mapstorage.NewMapURL()
-	//}
-
-	//} else {
-	//	// Хранение в памяти
-	//	fmt.Println("Using in-memory storage")
-	//	// Инициализация хранения в памяти
-	//	c.repository = mapstorage.NewMapURL()
-	//}
-
 }
 
 func (c *Configs) parseFlags() {

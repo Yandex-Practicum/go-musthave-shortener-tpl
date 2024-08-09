@@ -39,3 +39,7 @@ func (s *MapStorage) GetURL(shortURL string) (string, error) {
 func (s *MapStorage) Close() error {
 	return nil
 }
+
+func (s *MapStorage) Ping() error {
+	return nil
+}

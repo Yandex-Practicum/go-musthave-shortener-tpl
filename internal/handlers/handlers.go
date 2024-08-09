@@ -6,7 +6,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"io"
 	"net/http"
 )
@@ -15,13 +14,15 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
+	repo    service.Storage
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, repo service.Storage) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
 		logger:  sLog,
+		repo:    repo,
 	}
 }
 
@@ -155,8 +156,7 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
-	var checkPing *db.PstStorage
-	if err := checkPing.Ping(); err != nil {
+	if err := h.repo.Ping(); err != nil {
 		h.logger.Error("Error = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return

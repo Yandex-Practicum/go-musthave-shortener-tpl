@@ -20,20 +20,10 @@ func main() {
 	logs := logger.NewLogger(logger.WithLevel(configs.LogLevel))
 	logs.Info("Start logger")
 
-	// подключаемся к базе
-	//dataSourceName := configs.AddrDB
-	//dbPsql, err := db.NewPstStorage(dataSourceName)
-	//if err != nil {
-	//	logs.Error("Fatal", logger.ErrAttr(err))
-	//}
-
-	dbPsql := configs.repository
-	logs.Info("Connecting DB", dbPsql)
-	defer dbPsql.Close()
-
 	// инициализируем хранилище
-	//storage := mapstorage.NewMapURL()
-	//logs.Info("Storage created")
+	repo := configs.repository
+	logs.Info("Connecting DB", repo)
+	defer repo.Close()
 
 	// инициализируем файл для хранения
 	file, err := filestorage.NewSaveFile(configs.PathDB)
@@ -43,11 +33,11 @@ func main() {
 	defer file.Close()
 
 	// передаем в сервис хранилище
-	urlService := service.NewService(dbPsql, file)
+	urlService := service.NewService(repo, file)
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL
-	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
+	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs, repo)
 	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get
