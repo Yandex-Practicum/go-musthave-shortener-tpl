@@ -21,7 +21,7 @@ func TestGetURL(t *testing.T) {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
 	defer file.Close()
-	service := NewService(storageURL, file)
+	service := NewService(storageURL, logs)
 	t.Run("get_URL", func(t *testing.T) {
 		url, err := service.GetURL("")
 		assert.NotNil(t, err)

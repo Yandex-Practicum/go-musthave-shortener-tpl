@@ -21,7 +21,7 @@ func TestService_SaveURL(t *testing.T) {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
 	defer file.Close()
-	service := NewService(storageURL, file)
+	service := NewService(storageURL, logs)
 
 	t.Run("save_URL", func(t *testing.T) {
 		_, err := service.SaveURL("")

@@ -24,6 +24,7 @@ func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) 
 	}
 }
 
+// PostJSON обрабатываем JSON запрос и возвращаем короткую ссылку
 func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// создаем структуру для сохранения URL
@@ -41,7 +42,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
@@ -89,6 +90,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostURL обрабатываем обычный запрос и возвращаем короткую ссылку
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос из body
@@ -101,7 +103,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
@@ -128,6 +130,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(resultEncodingURL))
 }
 
+// GetURL возвращаем информацию по коротокой ссылке
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос по ключу
@@ -153,6 +156,7 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetPing Проверяем подключение к DB
 func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	if err := h.service.Ping(); err != nil {
 		h.logger.Error("Error = ", logger.ErrAttr(err))

@@ -52,6 +52,10 @@ func (s *SaveFile) Close() error {
 	return s.file.Close()
 }
 
+func (s *SaveFile) Ping() error {
+	return nil
+}
+
 type ReadFile struct {
 	file    *os.File
 	decoder *json.Decoder

@@ -1,17 +1,15 @@
 package service
 
-import (
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
-)
+import "github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 
 type Service struct {
 	storage Storage
-	dbFile  *filestorage.SaveFile
+	logger  *logger.Logger
 }
 
-func NewService(storage Storage, dbFile *filestorage.SaveFile) *Service {
+func NewService(storage Storage, logger *logger.Logger) *Service {
 	return &Service{
 		storage: storage,
-		dbFile:  dbFile,
+		logger:  logger,
 	}
 }

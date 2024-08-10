@@ -35,7 +35,7 @@ func TestPostURL(t *testing.T) {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
 	defer file.Close()
-	urlService := service.NewService(storage, file)
+	urlService := service.NewService(storage, logs)
 	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
 	t.Run("test_post_URL", func(t *testing.T) {
@@ -67,7 +67,7 @@ func TestPostURL(t *testing.T) {
 		shortHandlers.PostURL(wResonse, rRequest)
 
 		// Проверяем, что статус ответа - 200 OK
-		assert.Equal(t, http.StatusOK, wResonse.Code)
+		assert.Equal(t, http.StatusNotFound, wResonse.Code)
 	})
 }
 
@@ -86,7 +86,7 @@ func TestHandlersPostJSON(t *testing.T) {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
 	defer file.Close()
-	urlService := service.NewService(storage, file)
+	urlService := service.NewService(storage, logs)
 	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 
 	t.Run("test_post_JSON", func(t *testing.T) {
@@ -120,7 +120,7 @@ func TestGetURL(t *testing.T) {
 		logs.Error("Fatal", logger.ErrAttr(err))
 	}
 	defer file.Close()
-	urlService := service.NewService(storage, file)
+	urlService := service.NewService(storage, logs)
 	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
 	t.Run("test_get_URL", func(t *testing.T) {
 

@@ -7,7 +7,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"net/http"
 )
 
@@ -25,15 +24,8 @@ func main() {
 	logs.Info("Connecting DB", repo)
 	defer repo.Close()
 
-	// инициализируем файл для хранения
-	file, err := filestorage.NewSaveFile(configs.PathDB)
-	if err != nil {
-		logs.Error("Fatal", logger.ErrAttr(err))
-	}
-	defer file.Close()
-
-	// передаем в сервис хранилище
-	urlService := service.NewService(repo, file)
+	// инициализируем сервис
+	urlService := service.NewService(repo, logs)
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL
