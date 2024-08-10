@@ -17,7 +17,6 @@ type Event struct {
 type SaveFile struct {
 	file    *os.File
 	encoder *json.Encoder
-	events  []Event `json:"events"`
 }
 
 func NewSaveFile(filePath string) (*SaveFile, error) {
