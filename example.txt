@@ -1,0 +1,16 @@
+{"uuid":1,"short_url":"QceRy","original_url":"https://ya.ru"}
+{"uuid":2,"short_url":"TEXTU","original_url":"https://ya.ru"}
+{"uuid":3,"short_url":"IIcNx","original_url":"https://ya.ru"}
+{"uuid":4,"short_url":"rCuBA","original_url":"https://ya.ru"}
+{"uuid":5,"short_url":"tubmB","original_url":"https://ya.ru"}
+{"uuid":6,"short_url":"ywlTP","original_url":"https://ya.ru"}
+{"uuid":7,"short_url":"RDazS","original_url":"https://ya.ru"}
+{"uuid":8,"short_url":"gZlWX","original_url":"https://ya.ru"}
+{"uuid":9,"short_url":"uauGy","original_url":"https://ya.ru"}
+{"uuid":10,"short_url":"MgRkQ","original_url":"https://ya.ru"}
+{"uuid":11,"short_url":"eqsqY","original_url":"https://ya.ru"}
+{"uuid":12,"short_url":"aOzym","original_url":"https://ya.ru"}
+{"uuid":13,"short_url":"ycvPW","original_url":"https://ya.ru"}
+{"uuid":14,"short_url":"agPOy","original_url":"https://ya.ru"}
+{"uuid":15,"short_url":"UcUxV","original_url":"https://ya.ru"}
+{"uuid":16,"short_url":"PmbjB","original_url":"https://ya.ru"}

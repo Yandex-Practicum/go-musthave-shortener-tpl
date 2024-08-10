@@ -82,7 +82,7 @@ func (c *Configs) parseFlags() {
 	//например http://localhost:8080/qsd54gFg).
 	flag.StringVar(&c.BaseURL, "b", "http://localhost:8080", "Result net address host:port")
 	//Флаг -f отвечает за базовый путь сохранения storage
-	flag.StringVar(&c.PathDB, "f", "./exept.txt", "full name for file repository")
+	flag.StringVar(&c.PathDB, "f", "./example.txt", "full name for file repository")
 	// Флаг -l отвечает за logger
 	flag.StringVar(&c.LogLevel, "l", "info", "log level")
 	//Флаг -p отвечает за адрес подключения DB

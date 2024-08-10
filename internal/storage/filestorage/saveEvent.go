@@ -17,6 +17,7 @@ type Event struct {
 type SaveFile struct {
 	file    *os.File
 	encoder *json.Encoder
+	events  []Event `json:"events"`
 }
 
 func NewSaveFile(filePath string) (*SaveFile, error) {
@@ -77,6 +78,7 @@ func NewReadFile(filename string) (*ReadFile, error) {
 
 func (c *ReadFile) ReadEvent() (*Event, error) {
 	// добавьте вызов Decode для чтения и десериализации
+
 	event := &Event{}
 	if err := c.decoder.Decode(&event); err != nil {
 		return nil, err
