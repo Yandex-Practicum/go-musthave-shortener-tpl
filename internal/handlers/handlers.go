@@ -66,7 +66,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	encodeURL, err := h.service.SaveURL(url.URL)
 	if err != nil {
 		if errors.Is(err, errors2.ErrConflict) {
-			//w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusConflict)
 			json.NewEncoder(w).Encode(models.ResultURL{URL: h.resultBody(encodeURL)})
 			return
@@ -125,7 +125,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
 			// записываем заголовок, статус и короткую ссылку
 			//w.Header().Set("Content-Encoding", "gzip")
-			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusConflict)
 
 			w.Write([]byte(h.resultBody(encodeURL)))
