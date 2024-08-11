@@ -5,4 +5,5 @@ type Storage interface {
 	GetURL(string) (string, error)
 	Close() error
 	Ping() error
+	CheckURL(string) (string, error)
 }

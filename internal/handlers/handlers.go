@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
@@ -63,20 +65,23 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(url.URL)
 	if err != nil {
+		if errors.Is(err, errors2.ErrConflict) {
+			w.Header().Set("Content-Encoding", "gzip")
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(models.ResultURL{URL: h.resultBody(encodeURL)})
+			return
+		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// создаем корректную ссылку
-	resultEncodingURL := h.baseURL + "/" + encodeURL
 
 	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
 	result := models.ResultURL{
-		URL: resultEncodingURL,
+		URL: h.resultBody(encodeURL),
 	}
 
 	err = json.NewEncoder(w).Encode(result)
@@ -116,18 +121,26 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(string(body))
 	if err != nil {
+		if errors.Is(err, errors2.ErrConflict) {
+			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
+			// записываем заголовок, статус и короткую ссылку
+			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(http.StatusConflict)
+
+			w.Write([]byte(h.resultBody(encodeURL)))
+
+			return
+		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// создаем корректную ссылку
-	resultEncodingURL := h.baseURL + "/" + encodeURL
-
 	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(resultEncodingURL))
+	w.Write([]byte(h.resultBody(encodeURL)))
 }
 
 // PostBatchDB записываем запрос в db
@@ -166,19 +179,16 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 
 	// создаем короткую ссылку и записываем в resultMultipleURL
 	for _, req := range multipleURL {
-		shortURL, err := h.service.SaveURL(req.OriginalURL)
+		encodeURL, err := h.service.SaveURL(req.OriginalURL)
 		if err != nil {
 			h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		// создаем корректную ссылку
-		resultEncodingURL := h.baseURL + "/" + shortURL
-
 		resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
 			CorrelationID: req.CorrelationID,
-			ShortURL:      resultEncodingURL,
+			ShortURL:      h.resultBody(encodeURL),
 		})
 	}
 
@@ -229,4 +239,8 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handlers) resultBody(res string) string {
+	return h.baseURL + "/" + res
 }

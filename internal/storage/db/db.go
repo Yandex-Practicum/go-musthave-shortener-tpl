@@ -45,7 +45,8 @@ func (p *PstStorage) CreateTableIfNotExists() error {
     CREATE TABLE IF NOT EXISTS urls (
         id SERIAL PRIMARY KEY,
         originalURL TEXT NOT NULL,
-        shortURL TEXT NOT NULL
+        shortURL TEXT NOT NULL,
+        UNIQUE (original_url)
     );`
 	_, err := p.storage.Exec(query)
 	if err != nil {
