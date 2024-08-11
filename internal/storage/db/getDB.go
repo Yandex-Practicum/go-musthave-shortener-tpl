@@ -10,7 +10,7 @@ func (p *PstStorage) GetURL(shortURL string) (string, error) {
 	// делаем запрос
 	row := db.QueryRowContext(context.Background(), query, shortURL)
 
-	if err := row.Scan(originalURL); err != nil {
+	if err := row.Scan(&originalURL); err != nil {
 		return "", err
 	}
 	return originalURL, nil
