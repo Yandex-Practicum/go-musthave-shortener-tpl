@@ -173,9 +173,12 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// создаем корректную ссылку
+		resultEncodingURL := h.baseURL + "/" + shortURL
+
 		resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
 			CorrelationID: req.CorrelationID,
-			ShortURL:      shortURL,
+			ShortURL:      resultEncodingURL,
 		})
 	}
 
