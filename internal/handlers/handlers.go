@@ -125,7 +125,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
 			// записываем заголовок, статус и короткую ссылку
 			w.Header().Set("Content-Encoding", "gzip")
-			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 			w.WriteHeader(http.StatusConflict)
 
 			w.Write([]byte(h.resultBody(encodeURL)))
@@ -138,7 +138,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// записываем заголовок, статус и короткую ссылку
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(h.resultBody(encodeURL)))
 }
@@ -237,7 +237,7 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 }
 
