@@ -11,7 +11,7 @@ func (p *PstStorage) CheckURL(originalURL string) (string, error) {
 	var shortURL string
 
 	err := p.storage.QueryRowContext(context.Background(),
-		"SELECT shortURL FROM urls WHERE originalURL = $1",
+		"SELECT short_url FROM urls WHERE original_url = $1",
 		originalURL).Scan(&shortURL)
 
 	if errors.Is(err, sql.ErrNoRows) {

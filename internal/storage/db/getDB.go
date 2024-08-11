@@ -9,7 +9,7 @@ func (p *PstStorage) GetURL(shortURL string) (string, error) {
 	var originalURL string
 	db := p.storage
 	// создаем запрос
-	query := "SELECT originalURL FROM urls WHERE shortURL = $1"
+	query := "SELECT original_url FROM urls WHERE short_url = $1"
 	// делаем запрос
 	row := db.QueryRowContext(context.Background(), query, shortURL)
 

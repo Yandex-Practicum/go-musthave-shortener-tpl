@@ -10,7 +10,7 @@ func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
 		return err
 	}
 	// создаем запрос
-	query := "INSERT INTO urls (originalURL, shortURL) VALUES ($1, $2)"
+	query := "INSERT INTO urls (original_url, short_url) VALUES ($1, $2)"
 	_, err = tx.ExecContext(context.Background(), query, originalURL, shortURL)
 	if err != nil {
 		// если ошибка, то откатываем изменения
