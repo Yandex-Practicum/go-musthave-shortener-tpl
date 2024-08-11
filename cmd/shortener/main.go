@@ -36,6 +36,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Post("/", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostURL)))
 	r.Post("/api/shorten", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostJSON)))
+	r.Post("/api/shorten/batch", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostBatchDB)))
 	r.Get("/{id}", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.GetURL)))
 	r.Get("/ping", middleware.WithLogging(shortHandlers.GetPing))
 

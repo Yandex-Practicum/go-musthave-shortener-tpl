@@ -130,6 +130,67 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(resultEncodingURL))
 }
 
+// PostBatchDB записываем запрос в db
+func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
+	var multipleURL []models.MultipleURL
+
+	// читаем запрос из body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// проверяем на пустой body
+	if string(body) == "" {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{
+       "response": {
+           "text": "Извините, я пока ничего не умею"
+       },
+       "version": "1.0"
+   }`))
+		return
+	}
+
+	// Записываем в пустую структуру полученный запрос
+	err = json.Unmarshal(body, &multipleURL)
+	if err != nil {
+		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var resultMultipleURL []models.ResultMultipleURL
+
+	// создаем короткую ссылку и записываем в resultMultipleURL
+	for _, req := range multipleURL {
+		shortURL, err := h.service.SaveURL(req.OriginalURL)
+		if err != nil {
+			h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
+			CorrelationID: req.CorrelationID,
+			ShortURL:      shortURL,
+		})
+	}
+
+	jsonResponse, err := json.Marshal(resultMultipleURL)
+	if err != nil {
+		h.logger.Error("Error marshal JSON response = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+}
+
 // GetURL возвращаем информацию по коротокой ссылке
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
