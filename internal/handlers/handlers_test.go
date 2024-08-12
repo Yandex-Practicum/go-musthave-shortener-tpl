@@ -11,7 +11,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/mocks"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	db2 "github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
@@ -158,31 +157,6 @@ func TestGetPing(t *testing.T) {
 
 	if w.Header().Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Errorf("ожидался заголовок %s, но получен %s", "text/plain; charset=utf-8", w.Header().Get("Content-Type"))
-	}
-}
-func TestGetPingInternalServerError(t *testing.T) {
-	logger := logger.NewLogger(logger.WithLevel("info"))
-	con := "postgresql://shortner:123456789@localhost:5432/postgres?sslmode=disable"
-	db, err := db2.NewPstStorage(con)
-	if err != nil {
-		t.Fatal(err)
-	}
-	service := service.NewService(db, logger)
-	handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
-
-	// Установка ошибки в сервисе
-	db.Close()
-
-	req, err := http.NewRequest("GET", "/ping", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	w := httptest.NewRecorder()
-	handlers.GetPing(w, req)
-
-	if w.Code != http.StatusInternalServerError {
-		t.Errorf("ожидался статус %d, но получен %d", http.StatusInternalServerError, w.Code)
 	}
 }
 
