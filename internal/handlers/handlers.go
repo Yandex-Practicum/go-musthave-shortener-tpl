@@ -126,9 +126,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 			// записываем заголовок, статус и короткую ссылку
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 			w.WriteHeader(http.StatusConflict)
-
 			w.Write([]byte(h.resultBody(encodeURL)))
-
 			return
 		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
