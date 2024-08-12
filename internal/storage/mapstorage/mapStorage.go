@@ -2,7 +2,6 @@ package mapstorage
 
 import (
 	"errors"
-	"log"
 	"sync"
 )
 
@@ -25,7 +24,6 @@ func (s *MapStorage) SaveURL(shortURL, url string) error {
 	}
 
 	s.storage[shortURL] = url
-	log.Printf("Save key = %s, value = %s", shortURL, url)
 	return nil
 }
 

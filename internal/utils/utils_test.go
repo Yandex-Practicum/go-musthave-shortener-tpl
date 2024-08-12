@@ -9,7 +9,7 @@ import (
 
 func TestEncodeURL(t *testing.T) {
 	// Тестирование успешного случая
-	t.Run("successful encoding", func(t *testing.T) {
+	t.Run("successful_encoding", func(t *testing.T) {
 		url := "https://example.com"
 		expectedLen := 5
 		encoded, err := EncodeURL(url)
@@ -18,7 +18,7 @@ func TestEncodeURL(t *testing.T) {
 	})
 
 	// Тестирование случая с пустым URL
-	t.Run("empty URL", func(t *testing.T) {
+	t.Run("empty_URL", func(t *testing.T) {
 		url := ""
 		_, err := EncodeURL(url)
 		assert.NotNil(t, err)

@@ -7,7 +7,7 @@ import (
 )
 
 func TestMapStorage_SaveURL(t *testing.T) {
-	t.Run("successful saving", func(t *testing.T) {
+	t.Run("successful_saving", func(t *testing.T) {
 		s := NewMapURL()
 		err := s.SaveURL("test", "")
 		assert.NotNil(t, err)
@@ -18,7 +18,7 @@ func TestMapStorage_SaveURL(t *testing.T) {
 }
 
 func TestMapStorage_GetURL(t *testing.T) {
-	t.Run("successful getting", func(t *testing.T) {
+	t.Run("successful_getting", func(t *testing.T) {
 		s := NewMapURL()
 		err := s.SaveURL("test", "https://example.com")
 		assert.Nil(t, err)

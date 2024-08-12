@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"context"
 	"github.com/go-chi/chi/v5"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -18,11 +21,21 @@ import (
 
 func TestPostURL(t *testing.T) {
 	// Тест на успешное кодирование URL
+	logs := logger.NewLogger(logger.WithLevel("info"))
 	storage := mapstorage.NewMapURL()
-	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
 
-	t.Run("Success", func(t *testing.T) {
+	file, err := filestorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+
+	t.Run("test_post_URL", func(t *testing.T) {
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
 		wResonse := httptest.NewRecorder()
@@ -44,7 +57,7 @@ func TestPostURL(t *testing.T) {
 	})
 
 	//Тест на обработку пустого тела запроса
-	t.Run("EmptyRequestBody", func(t *testing.T) {
+	t.Run("empty_request_body", func(t *testing.T) {
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer([]byte("")))
 		wResonse := httptest.NewRecorder()
 
@@ -55,12 +68,52 @@ func TestPostURL(t *testing.T) {
 	})
 }
 
+func TestHandlersPostJSON(t *testing.T) {
+	logs := logger.NewLogger(logger.WithLevel("info"))
+	storage := mapstorage.NewMapURL()
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
+
+	file, err := filestorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+
+	t.Run("test_post_JSON", func(t *testing.T) {
+		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
+		param := strings.NewReader(payload)
+		rRequest := httptest.NewRequest("POST", "/url", param)
+		wResonse := httptest.NewRecorder()
+
+		shortHandlers.PostJSON(wResonse, rRequest)
+
+		// Проверяем, что статус ответа - 201 Created
+		assert.Equal(t, http.StatusCreated, wResonse.Code)
+
+	})
+}
+
 func TestGetURL(t *testing.T) {
 	// Тест на успешное декодирование URL
+	logs := logger.NewLogger(logger.WithLevel("info"))
+
 	storage := mapstorage.NewMapURL()
-	urlService := service.NewService(storage)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080")
-	t.Run("Success", func(t *testing.T) {
+	// инициализируем файл для хранения
+	fileName := "./test.txt"
+	defer os.Remove(fileName)
+
+	file, err := filestorage.NewSaveFile(fileName)
+	if err != nil {
+		logs.Error("Fatal", logger.ErrAttr(err))
+	}
+	defer file.Close()
+	urlService := service.NewService(storage, file)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	t.Run("test_get_URL", func(t *testing.T) {
 
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
