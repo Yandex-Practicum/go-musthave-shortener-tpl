@@ -172,23 +172,6 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//var resultMultipleURL []models.ResultMultipleURL
-	//
-	//// создаем короткую ссылку и записываем в resultMultipleURL
-	//for _, req := range multipleURL {
-	//	encodeURL, err := h.service.SaveURL(req.OriginalURL)
-	//	if err != nil {
-	//		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
-	//		w.WriteHeader(http.StatusInternalServerError)
-	//		return
-	//	}
-	//
-	//	resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
-	//		CorrelationID: req.CorrelationID,
-	//		ShortURL:      h.ResultBody(encodeURL),
-	//	})
-	//}
-
 	resultMultipleURL, err := h.service.SaveSliceOfDB(multipleURL, h.baseURL)
 	if err != nil {
 		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
