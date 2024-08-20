@@ -1,6 +1,10 @@
 package db
 
-import "context"
+import (
+	"context"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
+)
 
 func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
 
@@ -20,4 +24,37 @@ func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
 
 	// завершаем транзакцию
 	return tx.Commit()
+}
+
+func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([]models.ResultMultipleURL, error) {
+	var resultMultipleURL []models.ResultMultipleURL
+
+	tx, err := p.storage.Begin()
+	if err != nil {
+		return resultMultipleURL, err
+	}
+
+	// создаем короткую ссылку и записываем в resultMultipleURL
+	for _, req := range urls {
+		// проверяем есть ли в базе уже данный URL
+		encodeURL, err := p.CheckURL(req.OriginalURL)
+		if err == nil {
+			encodeURL, err = utils.EncodeURL(req.OriginalURL)
+			if err != nil {
+				return resultMultipleURL, err
+			}
+		}
+
+		resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
+			CorrelationID: req.CorrelationID,
+			ShortURL:      baseURL + "/" + encodeURL,
+		})
+
+		p.SaveURL(encodeURL, req.OriginalURL)
+		tx.Rollback()
+	}
+
+	// завершаем транзакцию
+	tx.Commit()
+	return resultMultipleURL, nil
 }

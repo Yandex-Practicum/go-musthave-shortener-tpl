@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	models "github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
 // MockStorage is a mock of Storage interface.
@@ -89,6 +90,21 @@ func (m *MockStorage) Ping() error {
 func (mr *MockStorageMockRecorder) Ping() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockStorage)(nil).Ping))
+}
+
+// SaveSliceOfDB mocks base method.
+func (m *MockStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([]models.ResultMultipleURL, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveSliceOfDB", urls, baseURL)
+	ret0, _ := ret[0].([]models.ResultMultipleURL)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveSliceOfDB indicates an expected call of SaveSliceOfDB.
+func (mr *MockStorageMockRecorder) SaveSliceOfDB(urls, baseURL interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSliceOfDB", reflect.TypeOf((*MockStorage)(nil).SaveSliceOfDB), urls, baseURL)
 }
 
 // SaveURL mocks base method.

@@ -68,7 +68,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, errors2.ErrConflict) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusConflict)
-			json.NewEncoder(w).Encode(models.ResultURL{URL: h.resultBody(encodeURL)})
+			json.NewEncoder(w).Encode(models.ResultURL{URL: h.ResultBody(encodeURL)})
 			return
 		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
@@ -81,7 +81,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 	result := models.ResultURL{
-		URL: h.resultBody(encodeURL),
+		URL: h.ResultBody(encodeURL),
 	}
 
 	err = json.NewEncoder(w).Encode(result)
@@ -126,7 +126,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 			// записываем заголовок, статус и короткую ссылку
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(h.resultBody(encodeURL)))
+			w.Write([]byte(h.ResultBody(encodeURL)))
 			return
 		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
@@ -137,7 +137,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(h.resultBody(encodeURL)))
+	w.Write([]byte(h.ResultBody(encodeURL)))
 }
 
 // PostBatchDB записываем запрос в db
@@ -172,21 +172,28 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resultMultipleURL []models.ResultMultipleURL
+	//var resultMultipleURL []models.ResultMultipleURL
+	//
+	//// создаем короткую ссылку и записываем в resultMultipleURL
+	//for _, req := range multipleURL {
+	//	encodeURL, err := h.service.SaveURL(req.OriginalURL)
+	//	if err != nil {
+	//		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
+	//		w.WriteHeader(http.StatusInternalServerError)
+	//		return
+	//	}
+	//
+	//	resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
+	//		CorrelationID: req.CorrelationID,
+	//		ShortURL:      h.ResultBody(encodeURL),
+	//	})
+	//}
 
-	// создаем короткую ссылку и записываем в resultMultipleURL
-	for _, req := range multipleURL {
-		encodeURL, err := h.service.SaveURL(req.OriginalURL)
-		if err != nil {
-			h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		resultMultipleURL = append(resultMultipleURL, models.ResultMultipleURL{
-			CorrelationID: req.CorrelationID,
-			ShortURL:      h.resultBody(encodeURL),
-		})
+	resultMultipleURL, err := h.service.SaveSliceOfDB(multipleURL, h.baseURL)
+	if err != nil {
+		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	jsonResponse, err := json.Marshal(resultMultipleURL)
@@ -238,6 +245,6 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Handlers) resultBody(res string) string {
+func (h *Handlers) ResultBody(res string) string {
 	return h.baseURL + "/" + res
 }
