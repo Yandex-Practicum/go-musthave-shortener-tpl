@@ -228,6 +228,18 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
+
+	//Если кука не содержит ID пользователя, хендлер должен возвращать HTTP-статус 401 Unauthorized
+	cook, err := r.Cookie("user_id")
+	if err != nil {
+		h.logger.Error("Error GetUsersURLs = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+	return
+
+}
+
 func (h *Handlers) ResultBody(res string) string {
 	return h.baseURL + "/" + res
 }
