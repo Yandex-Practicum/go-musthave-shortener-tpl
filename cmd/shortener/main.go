@@ -7,8 +7,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"net/http"
 )
 
@@ -18,22 +16,16 @@ func main() {
 	configs.Parse()
 
 	// инициализируем logger
-	logs := logger.NewLogger(logger.WithLevel(configs.flagLogLevel))
+	logs := logger.NewLogger(logger.WithLevel(configs.LogLevel))
 	logs.Info("Start logger")
 
 	// инициализируем хранилище
-	storage := mapstorage.NewMapURL()
-	logs.Info("Storage created")
+	repo := configs.repository
+	logs.Info("Connecting DB", repo)
+	defer repo.Close()
 
-	// инициализируем файл для хранения
-	file, err := filestorage.NewSaveFile(configs.flagPathDB)
-	if err != nil {
-		logs.Error("Fatal", logger.ErrAttr(err))
-	}
-	defer file.Close()
-
-	// передаем в сервис хранилище
-	urlService := service.NewService(storage, file)
+	// инициализируем сервис
+	urlService := service.NewService(repo, logs)
 	logs.Info(("Service created"))
 
 	// передаем в хенлер сервис и baseURL
@@ -44,7 +36,9 @@ func main() {
 	r := chi.NewRouter()
 	r.Post("/", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostURL)))
 	r.Post("/api/shorten", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostJSON)))
+	r.Post("/api/shorten/batch", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostBatchDB)))
 	r.Get("/{id}", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.GetURL)))
+	r.Get("/ping", middleware.WithLogging(shortHandlers.GetPing))
 
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {

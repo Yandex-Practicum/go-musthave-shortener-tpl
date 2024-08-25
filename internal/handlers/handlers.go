@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
@@ -24,6 +26,7 @@ func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) 
 	}
 }
 
+// PostJSON обрабатываем JSON запрос и возвращаем короткую ссылку
 func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// создаем структуру для сохранения URL
@@ -41,7 +44,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
@@ -62,20 +65,23 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(url.URL)
 	if err != nil {
+		if errors.Is(err, errors2.ErrConflict) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(models.ResultURL{URL: h.ResultBody(encodeURL)})
+			return
+		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// создаем корректную ссылку
-	resultEncodingURL := h.baseURL + "/" + encodeURL
 
 	// записываем заголовок, статус и короткую ссылку
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
 	result := models.ResultURL{
-		URL: resultEncodingURL,
+		URL: h.ResultBody(encodeURL),
 	}
 
 	err = json.NewEncoder(w).Encode(result)
@@ -89,6 +95,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostURL обрабатываем обычный запрос и возвращаем короткую ссылку
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос из body
@@ -101,7 +108,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	// проверяем на пустой body
 	if string(body) == "" {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{
        "response": {
            "text": "Извините, я пока ничего не умею"
@@ -114,20 +121,77 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(string(body))
 	if err != nil {
+		if errors.Is(err, errors2.ErrConflict) {
+			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
+			// записываем заголовок, статус и короткую ссылку
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(h.ResultBody(encodeURL)))
+			return
+		}
 		h.logger.Error("Error internal server = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// создаем корректную ссылку
-	resultEncodingURL := h.baseURL + "/" + encodeURL
-
 	// записываем заголовок, статус и короткую ссылку
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(resultEncodingURL))
+	w.Write([]byte(h.ResultBody(encodeURL)))
 }
 
+// PostBatchDB записываем запрос в db
+func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
+	var multipleURL []models.MultipleURL
+
+	// читаем запрос из body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// проверяем на пустой body
+	if string(body) == "" {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{
+       "response": {
+           "text": "Извините, я пока ничего не умею"
+       },
+       "version": "1.0"
+   }`))
+		return
+	}
+
+	// Записываем в пустую структуру полученный запрос
+	err = json.Unmarshal(body, &multipleURL)
+	if err != nil {
+		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	resultMultipleURL, err := h.service.SaveSliceOfDB(multipleURL, h.baseURL)
+	if err != nil {
+		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	jsonResponse, err := json.Marshal(resultMultipleURL)
+	if err != nil {
+		h.logger.Error("Error marshal JSON response = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+}
+
+// GetURL возвращаем информацию по коротокой ссылке
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос по ключу
@@ -151,4 +215,19 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
+}
+
+// GetPing Проверяем подключение к DB
+func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
+	if err := h.service.Ping(); err != nil {
+		h.logger.Error("Error = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handlers) ResultBody(res string) string {
+	return h.baseURL + "/" + res
 }

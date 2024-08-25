@@ -1,2 +1,0 @@
-{"uuid":1,"short_url":"UqYex","original_url":"https://practicum.yandex1.ru"}
-{"uuid":2,"short_url":"Hbxaf","original_url":"https://practicum.yandex1.ru"}

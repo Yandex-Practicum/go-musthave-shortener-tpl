@@ -52,6 +52,10 @@ func (s *SaveFile) Close() error {
 	return s.file.Close()
 }
 
+func (s *SaveFile) Ping() error {
+	return nil
+}
+
 type ReadFile struct {
 	file    *os.File
 	decoder *json.Decoder
@@ -73,6 +77,7 @@ func NewReadFile(filename string) (*ReadFile, error) {
 
 func (c *ReadFile) ReadEvent() (*Event, error) {
 	// добавьте вызов Decode для чтения и десериализации
+
 	event := &Event{}
 	if err := c.decoder.Decode(&event); err != nil {
 		return nil, err

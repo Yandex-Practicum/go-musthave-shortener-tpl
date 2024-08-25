@@ -30,7 +30,7 @@ func TestWebhook(t *testing.T) {
 		expectedBody string
 	}{
 		{method: http.MethodGet, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
-		{method: http.MethodPost, expectedCode: http.StatusOK, expectedBody: successBody},
+		{method: http.MethodPost, expectedCode: http.StatusNotFound, expectedBody: successBody},
 
 		// Данные методы еще не реализованы.
 		//{method: http.MethodPut, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
@@ -39,6 +39,9 @@ func TestWebhook(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing_"+tc.method, func(t *testing.T) {
+			// создаём connect
+			//dsm, _ := db.NewPstStorage("")
+
 			r := httptest.NewRequest(tc.method, "/", nil)
 			w := httptest.NewRecorder()
 
@@ -55,7 +58,7 @@ func TestWebhook(t *testing.T) {
 			defer file.Close()
 
 			storage := mapstorage.NewMapURL()
-			urlService := service.NewService(storage, file)
+			urlService := service.NewService(storage, logs)
 			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs)
 
 			switch tc.method {

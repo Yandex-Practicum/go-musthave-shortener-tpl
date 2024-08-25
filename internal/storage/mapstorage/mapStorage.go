@@ -2,6 +2,7 @@ package mapstorage
 
 import (
 	"errors"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"sync"
 )
 
@@ -34,4 +35,16 @@ func (s *MapStorage) GetURL(shortURL string) (string, error) {
 		return "", errors.New("URL not found")
 	}
 	return s.storage[shortURL], nil
+}
+
+func (s *MapStorage) Close() error {
+	return nil
+}
+
+func (s *MapStorage) Ping() error {
+	return nil
+}
+
+func (s *MapStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([]models.ResultMultipleURL, error) {
+	return nil, nil
 }
