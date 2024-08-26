@@ -38,7 +38,7 @@ func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, erro
 	// делаем запрос
 	rows, err := tx.QueryContext(context.Background(), query, userID)
 	defer rows.Close()
-	if rows == nil {
+	if err != nil {
 		return nil, sql.ErrNoRows
 	}
 
@@ -51,6 +51,10 @@ func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, erro
 		userURL.ShortURL = fmt.Sprintf("%s/%s", baseURL, userURL.ShortURL)
 		userURLs = append(userURLs, &userURL)
 		tx.Rollback()
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	// завершаем транзакцию

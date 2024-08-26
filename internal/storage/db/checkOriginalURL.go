@@ -21,14 +21,14 @@ func (p *PstStorage) CheckURL(originalURL string) (string, error) {
 	return shortURL, errors2.ErrConflict
 }
 
-func (p *PstStorage) CheckUser(user string) bool {
+func (p *PstStorage) CheckUser(user string) error {
 
 	err := p.storage.QueryRowContext(context.Background(),
 		"SELECT user_id FROM urls WHERE user_id = $1",
 		user)
 
-	if err != nil {
-		return false
+	if err.Err() != nil {
+		return err.Err()
 	}
-	return true
+	return nil
 }
