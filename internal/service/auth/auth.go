@@ -52,7 +52,7 @@ func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 			return nil, fmt.Errorf("incorrect method")
 		}
 
-		return sa.tokenSalt, nil
+		return sa.passwordSalt, nil
 	})
 	if err != nil || !parsedToken.Valid {
 		return "", fmt.Errorf("incorrect token: %v", err)

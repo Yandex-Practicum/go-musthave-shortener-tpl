@@ -53,6 +53,7 @@ func (a *AuthMiddleware) AuthMiddleware(h http.Handler) http.Handler {
 				Name:     string(UserIDContextKey),
 				Value:    token,
 				HttpOnly: true,
+				Path:     "/",
 			})
 
 			// Устанавливаем заголовок Authorization

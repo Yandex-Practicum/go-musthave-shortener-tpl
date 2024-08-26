@@ -50,10 +50,11 @@ func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, erro
 		}
 		userURL.ShortURL = fmt.Sprintf("%s/%s", baseURL, userURL.ShortURL)
 		userURLs = append(userURLs, &userURL)
-		tx.Rollback()
+
 	}
 
 	if err = rows.Err(); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 

@@ -60,12 +60,6 @@ func main() {
 		r.Get("/api/user/urls", shortHandlers.GetUsersURLs)
 	})
 
-	//r.Post("/", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostURL)))
-	//r.Post("/api/shorten", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostJSON)))
-	//r.Post("/api/shorten/batch", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.PostBatchDB)))
-	//r.Get("/{id}", middleware.WithLogging(middleware.GZipMiddleware(shortHandlers.GetURL)))
-	//r.Get("/ping", middleware.WithLogging(shortHandlers.GetPing))
-
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		logs.Error("Err:", logger.ErrAttr(err))
