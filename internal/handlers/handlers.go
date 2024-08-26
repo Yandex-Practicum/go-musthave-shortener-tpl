@@ -255,7 +255,7 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
 	if !ok || userID == "" {
-		h.logger.Error("Error = ", errors2.ErrUserIDNotContext)
+		h.logger.Error("Error = ", logger.ErrAttr(errors2.ErrUserIDNotContext))
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

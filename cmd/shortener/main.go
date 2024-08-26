@@ -22,7 +22,7 @@ func main() {
 
 	// инициализируем хранилище
 	repo := configs.repository
-	logs.Info("Connecting DB", repo)
+	logs.Info("Connecting DB")
 	defer repo.Close()
 
 	// инициализируем сервис
