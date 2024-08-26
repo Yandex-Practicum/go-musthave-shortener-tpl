@@ -37,10 +37,10 @@ func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, erro
 
 	// делаем запрос
 	rows, err := tx.QueryContext(context.Background(), query, userID)
-	defer rows.Close()
 	if err != nil {
 		return nil, sql.ErrNoRows
 	}
+	defer rows.Close()
 
 	//собираем все сохраненные ссылки от пользователя
 	for rows.Next() {
