@@ -7,7 +7,9 @@ import (
 	"net/http"
 )
 
-const UserIDContextKey = "user_id"
+type contextKey string
+
+const UserIDContextKey contextKey = "user_id"
 
 type AuthMiddleware struct {
 	authService *auth.ServiceAuth
@@ -27,7 +29,7 @@ func (a *AuthMiddleware) AuthMiddleware(h http.Handler) http.Handler {
 			accessToken = authHeader
 		} else {
 			//читаем токен из кук
-			cookie, err := r.Cookie(UserIDContextKey)
+			cookie, err := r.Cookie(string(UserIDContextKey))
 			if err == nil && cookie.Value != "" {
 				accessToken = cookie.Value
 			} else {
@@ -48,7 +50,7 @@ func (a *AuthMiddleware) AuthMiddleware(h http.Handler) http.Handler {
 
 			//создаем куку
 			http.SetCookie(w, &http.Cookie{
-				Name:     UserIDContextKey,
+				Name:     string(UserIDContextKey),
 				Value:    token,
 				HttpOnly: true,
 			})
@@ -65,7 +67,7 @@ func (a *AuthMiddleware) AuthMiddleware(h http.Handler) http.Handler {
 
 func (a *AuthMiddleware) CheckAuthMiddleware(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		accessToken, err := r.Cookie(UserIDContextKey)
+		accessToken, err := r.Cookie(string(UserIDContextKey))
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
