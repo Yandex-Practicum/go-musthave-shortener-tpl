@@ -45,7 +45,7 @@ func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, erro
 	//собираем все сохраненные ссылки от пользователя
 	for rows.Next() {
 		var userURL models.UserURLs
-		if err := rows.Scan(&userURL.ShortURL, &userURL.OriginalURL); err != nil {
+		if err = rows.Scan(&userURL.ShortURL, &userURL.OriginalURL); err != nil {
 			return nil, err
 		}
 		userURL.ShortURL = fmt.Sprintf("%s/%s", baseURL, userURL.ShortURL)
