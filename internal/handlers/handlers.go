@@ -265,14 +265,17 @@ func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if len(listURLs) == 0 {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
