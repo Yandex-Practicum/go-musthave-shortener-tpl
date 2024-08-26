@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
 func (p *PstStorage) GetURL(shortURL string) (string, error) {
@@ -21,4 +23,37 @@ func (p *PstStorage) GetURL(shortURL string) (string, error) {
 		return "", err
 	}
 	return originalURL, nil
+}
+
+func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
+	var userURLs []*models.UserURLs
+	tx, err := p.storage.Begin()
+
+	if err != nil {
+		return nil, err
+	}
+	// создаем запрос
+	query := "SELECT short_url, original_url FROM urls WHERE user_id = $1"
+
+	// делаем запрос
+	rows, err := tx.QueryContext(context.Background(), query, userID)
+	defer rows.Close()
+	if rows == nil {
+		return nil, sql.ErrNoRows
+	}
+
+	//собираем все сохраненные ссылки от пользователя
+	for rows.Next() {
+		var userURL models.UserURLs
+		if err := rows.Scan(&userURL.ShortURL, &userURL.OriginalURL); err != nil {
+			return nil, err
+		}
+		userURL.ShortURL = fmt.Sprintf("%s/%s", baseURL, userURL.ShortURL)
+		userURLs = append(userURLs, &userURL)
+		tx.Rollback()
+	}
+
+	// завершаем транзакцию
+	tx.Commit()
+	return userURLs, nil
 }

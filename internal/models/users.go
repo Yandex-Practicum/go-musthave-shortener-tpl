@@ -6,10 +6,10 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Login string `json:"l"`
+	UserID string `json:"uid"`
 }
 
-type User struct {
-	ID    string
-	Token string
+type UserURLs struct {
+	ShortURL    string `json:"short_url"`
+	OriginalURL string `json:"original_url"`
 }

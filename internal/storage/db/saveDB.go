@@ -6,7 +6,13 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
-func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
+func (p *PstStorage) SaveURL(shortURL, originalURL, userID string) error {
+	var user interface{}
+	if userID == "" {
+		user = nil
+	} else {
+		user = userID
+	}
 
 	// начинаем транзакцию
 	tx, err := p.storage.Begin()
@@ -14,8 +20,8 @@ func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
 		return err
 	}
 	// создаем запрос
-	query := "INSERT INTO urls (original_url, short_url) VALUES ($1, $2)"
-	_, err = tx.ExecContext(context.Background(), query, originalURL, shortURL)
+	query := "INSERT INTO urls (original_url, short_url, user_id) VALUES ($1, $2, $3)"
+	_, err = tx.ExecContext(context.Background(), query, originalURL, shortURL, user)
 	if err != nil {
 		// если ошибка, то откатываем изменения
 		tx.Rollback()
@@ -26,7 +32,7 @@ func (p *PstStorage) SaveURL(shortURL, originalURL string) error {
 	return tx.Commit()
 }
 
-func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([]models.ResultMultipleURL, error) {
+func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	var resultMultipleURL []models.ResultMultipleURL
 
 	tx, err := p.storage.Begin()
@@ -50,7 +56,7 @@ func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([
 			ShortURL:      baseURL + "/" + encodeURL,
 		})
 
-		p.SaveURL(encodeURL, req.OriginalURL)
+		p.SaveURL(encodeURL, req.OriginalURL, userID)
 		tx.Rollback()
 	}
 

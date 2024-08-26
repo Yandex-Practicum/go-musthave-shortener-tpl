@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GZipMiddleware(h http.HandlerFunc) http.Handler {
+func GZipMiddleware(h http.Handler) http.Handler {
 	GZip := func(w http.ResponseWriter, r *http.Request) {
 		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
 		// который будем передавать следующей функции

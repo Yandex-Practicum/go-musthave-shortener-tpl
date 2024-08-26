@@ -17,7 +17,7 @@ func NewMapURL() *MapStorage {
 	}
 }
 
-func (s *MapStorage) SaveURL(shortURL, url string) error {
+func (s *MapStorage) SaveURL(shortURL, url, userID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if url == "" {
@@ -45,6 +45,10 @@ func (s *MapStorage) Ping() error {
 	return nil
 }
 
-func (s *MapStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL string) ([]models.ResultMultipleURL, error) {
+func (s *MapStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	return nil, nil
+}
+
+func (s *MapStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
+	return nil, errors.New("not use GetAllURL in map")
 }
