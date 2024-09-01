@@ -47,6 +47,7 @@ func (p *PstStorage) CreateTableIfNotExists() error {
         original_url TEXT NOT NULL,
         short_url TEXT NOT NULL,
         user_id UUID,
+        is_deleted BOOL NOT NULL DEFAULT FALSE,
         UNIQUE (original_url)
     );`
 	_, err := p.storage.Exec(query)

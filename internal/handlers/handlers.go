@@ -10,6 +10,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/templates"
 	"io"
 	"net/http"
 )
@@ -230,7 +231,12 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	//ищем в мапе сохраненный url
 	url, err := h.service.GetURL(shortURL)
 	if err != nil {
-		h.logger.Error("Error = ", logger.ErrAttr(err))
+		if errors.Is(err, errors2.ErrDeletedURL) {
+			h.logger.Error("error =", "GET/{id}", errors2.ErrDeletedURL)
+			w.WriteHeader(http.StatusGone)
+			return
+		}
+		h.logger.Error("GET/{id} =", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -289,6 +295,49 @@ func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+}
+
+func (h *Handlers) DeleteURLs(w http.ResponseWriter, r *http.Request) {
+	var sliceURLs []string
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	// получаем из контектса userID
+	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+
+	if !ok || userID == "" {
+		h.logger.Info("Error = not userID")
+		http.Error(w, "not userID", http.StatusUnauthorized)
+		return
+	}
+
+	if err := json.Unmarshal(body, &sliceURLs); err != nil {
+		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
+		http.Error(w, "cannot decode request", http.StatusBadRequest)
+		return
+	}
+
+	// сигнальный канал для завершения горутин
+	doneCh := make(chan struct{})
+	defer close(doneCh)
+
+	// объединяем все в один канал
+	finalCH := templates.FanIn(doneCh, sliceURLs)
+
+	// меняем статус флага в столбце is_deleted
+	err = h.service.DeletedURLs(doneCh, finalCH, userID)
+	if err != nil {
+		h.logger.Error("Error deleted urls", logger.ErrAttr(err))
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func (h *Handlers) ResultBody(res string) string {

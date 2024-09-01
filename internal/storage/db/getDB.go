@@ -4,14 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
 func (p *PstStorage) GetURL(shortURL string) (string, error) {
 	var originalURL string
+	var deletedURL bool
+	//var storage []*models.Storage
 	db := p.storage
 	// создаем запрос
-	query := "SELECT original_url FROM urls WHERE short_url = $1"
+	query := "SELECT original_url, is_deleted FROM urls WHERE short_url = $1"
 	// делаем запрос
 	row := db.QueryRowContext(context.Background(), query, shortURL)
 
@@ -19,9 +22,14 @@ func (p *PstStorage) GetURL(shortURL string) (string, error) {
 		return "", sql.ErrNoRows
 	}
 
-	if err := row.Scan(&originalURL); err != nil {
+	if err := row.Scan(&originalURL, &deletedURL); err != nil {
 		return "", err
 	}
+
+	if deletedURL {
+		return "", errors2.ErrDeletedURL
+	}
+
 	return originalURL, nil
 }
 

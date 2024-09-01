@@ -21,7 +21,7 @@ func main() {
 	logs.Info("Start logger")
 
 	// инициализируем хранилище
-	repo := configs.repository
+	repo := initDB(configs.AddrDB, configs.PathFile)
 	logs.Info("Connecting DB")
 	defer repo.Close()
 
@@ -58,6 +58,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(authorization.CheckAuthMiddleware)
 		r.Get("/api/user/urls", shortHandlers.GetUsersURLs)
+		r.Delete("/api/user/urls", shortHandlers.DeleteURLs)
 	})
 
 	// слушаем выбранны порт = configs.AddrServer
