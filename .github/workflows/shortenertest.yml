@@ -18,7 +18,9 @@ jobs:
 
   shortenertest:
     runs-on: ubuntu-latest
+
     container: golang:1.23
+
     needs: branchtest
 
     services:
