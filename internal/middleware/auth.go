@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 	"net/http"
 )
@@ -19,6 +20,11 @@ func NewAuthMiddleware(authService *auth.ServiceAuth) *AuthMiddleware {
 	return &AuthMiddleware{
 		authService: authService,
 	}
+}
+
+func GetUserFromContext(ctx context.Context) (models.User, bool) {
+	user, ok := ctx.Value(UserIDContextKey).(models.User)
+	return user, ok
 }
 
 func (a *AuthMiddleware) AuthMiddleware(h http.Handler) http.Handler {

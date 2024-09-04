@@ -1,43 +1,10 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 )
 
-func (p *PstStorage) DeletedURLs(doneCh chan struct{}, urlCh chan string, userID string) error {
-	var urls []string
-	updated := false
-	for {
-		select {
-		case url, ok := <-urlCh:
-			if !ok {
-				// Канал закрыт
-				if !updated && len(urls) > 0 {
-					err := updateDatabase(p.storage, userID, urls)
-					if err != nil {
-						return err
-					}
-				}
-				return nil
-			}
-			urls = append(urls, url)
-		case <-doneCh:
-			// Получен сигнал завершения работы
-			if len(urls) > 0 {
-				err := updateDatabase(p.storage, userID, urls)
-				if err != nil {
-					return err
-				}
-				updated = true
-			}
-			return nil
-		}
-	}
-}
-
-// updateDatabase выполняет пакетное обновление в базе данных.
-func updateDatabase(db *sql.DB, userID string, urls []string) error {
+func (p *PstStorage) DeletedURLs(urls []string, userID string) error {
 	if len(urls) == 0 {
 		return nil
 	}
@@ -56,7 +23,7 @@ func updateDatabase(db *sql.DB, userID string, urls []string) error {
 	urlsArray += "}"
 
 	// Выполняем запрос.
-	_, err := db.Exec(query, userID, urlsArray)
+	_, err := p.storage.Exec(query, userID, urlsArray)
 	if err != nil {
 		return err
 	}

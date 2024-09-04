@@ -41,19 +41,40 @@ func (p *PstStorage) initDB(dataSourceName string) error {
 
 // Функция для создания таблицы, если она не существует
 func (p *PstStorage) CreateTableIfNotExists() error {
-	query := `
+	db, err := p.storage.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			db.Rollback()
+		} else {
+			db.Commit()
+		}
+	}()
+
+	queryCreate := `
     CREATE TABLE IF NOT EXISTS urls (
         id SERIAL PRIMARY KEY,
         original_url TEXT NOT NULL,
         short_url TEXT NOT NULL,
         user_id UUID,
-        is_deleted BOOL NOT NULL DEFAULT FALSE,
         UNIQUE (original_url)
     );`
-	_, err := p.storage.Exec(query)
+
+	_, err = db.Exec(queryCreate)
 	if err != nil {
 		return err
 	}
+
+	queryUpdate := `
+    ALTER TABLE urls ADD COLUMN IF NOT EXISTS is_deleted BOOL NOT NULL DEFAULT FALSE;`
+
+	_, err = db.Exec(queryUpdate)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

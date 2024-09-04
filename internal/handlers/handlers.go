@@ -10,7 +10,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/templates"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 	"io"
 	"net/http"
 )
@@ -19,13 +19,15 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
+	worker  *workers.WorkerDeleted
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, worker *workers.WorkerDeleted) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
 		logger:  sLog,
+		worker:  worker,
 	}
 }
 
@@ -297,43 +299,26 @@ func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) DeleteURLs(w http.ResponseWriter, r *http.Request) {
-	var sliceURLs []string
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
-		w.WriteHeader(http.StatusBadRequest)
+func (h *Handlers) DeletionURLs(w http.ResponseWriter, r *http.Request) {
+	var urls []string
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(&urls); err != nil {
+		h.logger.Error("cannot decode request JSON body:", "error = ", err)
+		http.Error(w, "cannot decode request JSON body", http.StatusInternalServerError)
 		return
 	}
-
-	defer r.Body.Close()
 
 	// получаем из контектса userID
-	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+	userID, _ := r.Context().Value(middleware.UserIDContextKey).(string)
 
-	if !ok || userID == "" {
-		h.logger.Info("Error = not userID")
-		http.Error(w, "not userID", http.StatusUnauthorized)
-		return
+	req := workers.DeletionRequest{
+		User: userID,
+		URLs: urls,
 	}
 
-	if err := json.Unmarshal(body, &sliceURLs); err != nil {
-		h.logger.Debug("cannot decode request JSON body", logger.ErrAttr(err))
-		http.Error(w, "cannot decode request", http.StatusBadRequest)
-		return
-	}
-
-	// сигнальный канал для завершения горутин
-	doneCh := make(chan struct{})
-	defer close(doneCh)
-
-	// объединяем все в один канал
-	finalCH := templates.FanIn(doneCh, sliceURLs)
-
-	// меняем статус флага в столбце is_deleted
-	err = h.service.DeletedURLs(doneCh, finalCH, userID)
-	if err != nil {
-		h.logger.Error("Error deleted urls", logger.ErrAttr(err))
+	if err := h.worker.SendDeletionRequestToWorker(req); err != nil {
+		h.logger.Error("error send to deletion worker request", "error = ", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

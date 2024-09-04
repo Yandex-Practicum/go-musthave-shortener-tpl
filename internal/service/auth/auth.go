@@ -37,14 +37,6 @@ func NewServiceAuth(storage service.Storage) *ServiceAuth {
 	}
 }
 
-//func (sa *ServiceAuth) CheckUserDB(userID string) error {
-//	ok := sa.userStorage.CheckUser(userID)
-//	if ok {
-//		return nil
-//	}
-//	return errors.New("user does not exist")
-//}
-
 func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	claims := &models.Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {

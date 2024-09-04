@@ -11,5 +11,5 @@ type Storage interface {
 	Ping() error
 	CheckURL(string) (string, error)
 	GetAllURL(userID, baseURL string) ([]*models.UserURLs, error)
-	DeletedURLs(doneCh chan struct{}, urlCh chan string, userID string) error
+	DeletedURLs(urls []string, userID string) error
 }

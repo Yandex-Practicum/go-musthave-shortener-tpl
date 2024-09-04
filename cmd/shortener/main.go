@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
@@ -8,6 +9,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 	"net/http"
 )
 
@@ -37,8 +39,11 @@ func main() {
 	serviceAuth := auth.NewServiceAuth(repo)
 	authorization := middleware.NewAuthMiddleware(serviceAuth)
 
+	// инициализируем worker
+	worker := workers.NewWorkerDeleted(urlService)
+
 	// передаем в хенлер сервис и baseURL
-	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs)
+	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs, worker)
 	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
 	// инициализировали роутер и создали Post и Get
@@ -58,9 +63,12 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(authorization.CheckAuthMiddleware)
 		r.Get("/api/user/urls", shortHandlers.GetUsersURLs)
-		r.Delete("/api/user/urls", shortHandlers.DeleteURLs)
+		r.Delete("/api/user/urls", shortHandlers.DeletionURLs)
 	})
-
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go worker.StartWorkerDeletion(ctx)
+	go worker.StartErrorListener(ctx)
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		logs.Error("Err:", logger.ErrAttr(err))

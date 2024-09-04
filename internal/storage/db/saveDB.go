@@ -7,11 +7,9 @@ import (
 )
 
 func (p *PstStorage) SaveURL(shortURL, originalURL, userID string) error {
-	var user interface{}
-	if userID == "" {
-		user = nil
-	} else {
-		user = userID
+	var user *string
+	if userID != "" {
+		user = &userID
 	}
 
 	// начинаем транзакцию
