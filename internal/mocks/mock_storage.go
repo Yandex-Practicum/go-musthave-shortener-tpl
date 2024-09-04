@@ -64,17 +64,17 @@ func (mr *MockStorageMockRecorder) Close() *gomock.Call {
 }
 
 // DeletedURLs mocks base method.
-func (m *MockStorage) DeletedURLs(url []string, userID string) error {
+func (m *MockStorage) DeletedURLs(urls []string, userID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletedURLs", url, userID)
+	ret := m.ctrl.Call(m, "DeletedURLs", urls, userID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeletedURLs indicates an expected call of DeletedURLs.
-func (mr *MockStorageMockRecorder) DeletedURLs(url, userID interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) DeletedURLs(urls, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletedURLs", reflect.TypeOf((*MockStorage)(nil).DeletedURLs), url, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletedURLs", reflect.TypeOf((*MockStorage)(nil).DeletedURLs), urls, userID)
 }
 
 // GetAllURL mocks base method.
