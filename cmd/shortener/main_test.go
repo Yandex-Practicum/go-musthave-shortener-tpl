@@ -31,10 +31,6 @@ func TestWebhook(t *testing.T) {
 	}{
 		{method: http.MethodGet, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
 		{method: http.MethodPost, expectedCode: http.StatusNotFound, expectedBody: successBody},
-
-		// Данные методы еще не реализованы.
-		//{method: http.MethodPut, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
-		//{method: http.MethodDelete, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
 	}
 
 	for _, tc := range testCases {
@@ -59,7 +55,7 @@ func TestWebhook(t *testing.T) {
 
 			storage := mapstorage.NewMapURL()
 			urlService := service.NewService(storage, logs)
-			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs)
+			shortHandlers := handlers.NewHandlers(urlService, "http://localhost:8080/", logs, nil)
 
 			switch tc.method {
 			case http.MethodPost:
