@@ -24,11 +24,11 @@ func TestService_SaveURL(t *testing.T) {
 	service := NewService(storageURL, logs)
 
 	t.Run("save_URL", func(t *testing.T) {
-		_, err := service.SaveURL("")
+		_, err := service.SaveURL("", "")
 		assert.NotNil(t, err)
 		assert.Equal(t, "URL is empty", err.Error())
 
-		_, err = service.SaveURL("http://example.com")
+		_, err = service.SaveURL("http://example.com", "")
 		assert.Nil(t, err)
 	})
 }

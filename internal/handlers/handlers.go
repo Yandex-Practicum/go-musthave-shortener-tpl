@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"github.com/go-chi/chi/v5"
 	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 	"io"
 	"net/http"
 )
@@ -16,13 +19,15 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
+	worker  *workers.WorkerDeleted
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, worker *workers.WorkerDeleted) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
 		logger:  sLog,
+		worker:  worker,
 	}
 }
 
@@ -40,6 +45,13 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		h.logger.Error("Error bad request = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
+	}
+
+	// получаем из контектса userID
+	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+
+	if !ok || userID == "" {
+		h.logger.Info("Error = not userID")
 	}
 
 	// проверяем на пустой body
@@ -62,8 +74,10 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//
+
 	// создаем короткую ссылку
-	encodeURL, err := h.service.SaveURL(url.URL)
+	encodeURL, err := h.service.SaveURL(url.URL, userID)
 	if err != nil {
 		if errors.Is(err, errors2.ErrConflict) {
 			w.Header().Set("Content-Type", "application/json")
@@ -117,9 +131,15 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
    }`))
 		return
 	}
+	// получаем из контектса userID
+	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+
+	if !ok || userID == "" {
+		h.logger.Info("Error = not userID")
+	}
 
 	// создаем короткую ссылку
-	encodeURL, err := h.service.SaveURL(string(body))
+	encodeURL, err := h.service.SaveURL(string(body), userID)
 	if err != nil {
 		if errors.Is(err, errors2.ErrConflict) {
 			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
@@ -164,6 +184,13 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// получаем из контектса userID
+	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+
+	if !ok || userID == "" {
+		h.logger.Info("Error = not userID")
+	}
+
 	// Записываем в пустую структуру полученный запрос
 	err = json.Unmarshal(body, &multipleURL)
 	if err != nil {
@@ -172,7 +199,7 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultMultipleURL, err := h.service.SaveSliceOfDB(multipleURL, h.baseURL)
+	resultMultipleURL, err := h.service.SaveSliceOfDB(multipleURL, h.baseURL, userID)
 	if err != nil {
 		h.logger.Error("Error shorten URL = ", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -206,7 +233,12 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	//ищем в мапе сохраненный url
 	url, err := h.service.GetURL(shortURL)
 	if err != nil {
-		h.logger.Error("Error = ", logger.ErrAttr(err))
+		if errors.Is(err, errors2.ErrDeletedURL) {
+			h.logger.Error("error =", "GET/{id}", errors2.ErrDeletedURL)
+			w.WriteHeader(http.StatusGone)
+			return
+		}
+		h.logger.Error("GET/{id} =", logger.ErrAttr(err))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -226,6 +258,71 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
+	if !ok || userID == "" {
+		h.logger.Error("Error = ", logger.ErrAttr(errors2.ErrUserIDNotContext))
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Получаем список URL пользователя
+	listURLs, err := h.service.GetAllURL(userID, h.baseURL)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if len(listURLs) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err = json.NewEncoder(w).Encode(listURLs); err != nil {
+		h.logger.Error(`"error": "failed to marshal response", "details": `, logger.ErrAttr(err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (h *Handlers) DeletionURLs(w http.ResponseWriter, r *http.Request) {
+	var urls []string
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(&urls); err != nil {
+		h.logger.Error("cannot decode request JSON body:", "error = ", err)
+		http.Error(w, "cannot decode request JSON body", http.StatusInternalServerError)
+		return
+	}
+
+	// получаем из контектса userID
+	userID, _ := r.Context().Value(middleware.UserIDContextKey).(string)
+
+	req := workers.DeletionRequest{
+		User: userID,
+		URLs: urls,
+	}
+
+	if err := h.worker.SendDeletionRequestToWorker(req); err != nil {
+		h.logger.Error("error send to deletion worker request", "error = ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func (h *Handlers) ResultBody(res string) string {

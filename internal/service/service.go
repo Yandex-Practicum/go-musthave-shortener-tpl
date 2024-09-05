@@ -1,6 +1,8 @@
 package service
 
-import "github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
+import (
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
+)
 
 type Service struct {
 	storage Storage

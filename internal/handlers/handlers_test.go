@@ -25,7 +25,7 @@ func TestPostURL(t *testing.T) {
 	storage := mapstorage.NewMapURL()
 
 	urlService := service.NewService(storage, logs)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, nil)
 
 	t.Run("test_post_URL", func(t *testing.T) {
 		payload := []byte("http://example.com")
@@ -65,7 +65,7 @@ func TestHandlersPostJSON(t *testing.T) {
 	storage := mapstorage.NewMapURL()
 
 	urlService := service.NewService(storage, logs)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, nil)
 
 	t.Run("test_post_JSON", func(t *testing.T) {
 		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
@@ -100,7 +100,7 @@ func TestGetURL(t *testing.T) {
 	storage := mapstorage.NewMapURL()
 
 	urlService := service.NewService(storage, logs)
-	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs)
+	shortHandlers := NewHandlers(urlService, "http://localhost:8080", logs, nil)
 	t.Run("test_get_URL", func(t *testing.T) {
 
 		payload := []byte("http://example.com")

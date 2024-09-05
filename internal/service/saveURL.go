@@ -6,7 +6,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
-func (s *Service) SaveURL(url string) (string, error) {
+func (s *Service) SaveURL(url, userID string) (string, error) {
 
 	// проверяем есть ли в базе уже данный URL
 	if shortURL, err := s.storage.CheckURL(url); err != nil {
@@ -21,7 +21,7 @@ func (s *Service) SaveURL(url string) (string, error) {
 		return "", err
 	}
 
-	err = s.storage.SaveURL(encodeURL, url)
+	err = s.storage.SaveURL(encodeURL, url, userID)
 	if err != nil {
 		s.logger.Error("Error = ", logger.ErrAttr(err))
 		return "", err

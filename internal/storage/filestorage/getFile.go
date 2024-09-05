@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"os"
 )
 
@@ -30,4 +31,8 @@ func (s *SaveFile) GetURL(shortURL string) (string, error) {
 	}
 
 	return "", errors.New("короткий URL не найден")
+}
+
+func (s *SaveFile) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
+	return nil, errors.New("not use GetAllURL in file")
 }
