@@ -13,10 +13,10 @@ type contextKey string
 const UserIDContextKey contextKey = "user_id"
 
 type AuthMiddleware struct {
-	authService *auth.ServiceAuth
+	authService auth.AuthService
 }
 
-func NewAuthMiddleware(authService *auth.ServiceAuth) *AuthMiddleware {
+func NewAuthMiddleware(authService auth.AuthService) *AuthMiddleware {
 	return &AuthMiddleware{
 		authService: authService,
 	}

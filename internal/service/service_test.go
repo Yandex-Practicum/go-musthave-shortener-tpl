@@ -13,3 +13,10 @@ func TestNewService(t *testing.T) {
 		assert.NotNil(t, s)
 	})
 }
+
+func BenchmarkNewService(b *testing.B) {
+
+	for i := 0; i < b.N; i++ {
+		NewService(nil, logger.NewLogger(logger.WithLevel("info")))
+	}
+}

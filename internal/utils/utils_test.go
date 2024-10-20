@@ -25,3 +25,10 @@ func TestEncodeURL(t *testing.T) {
 		assert.Equal(t, errors.New("URL is empty"), err, "Ошибка должна быть 'URL is empty'")
 	})
 }
+
+func BenchmarkEncodeURL(b *testing.B) {
+
+	for i := 0; i < b.N; i++ {
+		EncodeURL("https://example.com")
+	}
+}

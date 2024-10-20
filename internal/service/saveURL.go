@@ -1,7 +1,7 @@
 package service
 
 import (
-	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )

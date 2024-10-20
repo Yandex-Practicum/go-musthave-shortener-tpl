@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 )
 
 func (p *PstStorage) CheckURL(originalURL string) (string, error) {

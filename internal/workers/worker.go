@@ -6,6 +6,11 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 )
 
+//go:generate mockgen -source=worker.go -destination=mock_worker.go -package=workers
+type Worker interface {
+	SendDeletionRequestToWorker(req DeletionRequest) error
+}
+
 type DeletionRequest struct {
 	User string
 	URLs []string

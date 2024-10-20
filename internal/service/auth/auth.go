@@ -13,8 +13,9 @@ const (
 	tokenSalt  = "tokenPracticum32"
 )
 
+//go:generate mockgen -source=auth.go -destination=mock_auth.go -package=auth
+// AuthService сервис отвечающий за авторизацию и верификацию.
 type AuthService interface {
-	//CheckUserDB(userID string) error
 	VerifyUser(token string) (string, error)
 	CreatTokenForUser(userID string) (string, error)
 }

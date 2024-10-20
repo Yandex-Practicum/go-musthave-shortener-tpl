@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-chi/chi/v5"
-	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
@@ -19,10 +19,11 @@ type Handlers struct {
 	service *service.Service
 	baseURL string
 	logger  *logger.Logger
-	worker  *workers.WorkerDeleted
+	worker  workers.Worker
+	//worker  *workers.WorkerDeleted
 }
 
-func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, worker *workers.WorkerDeleted) *Handlers {
+func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, worker workers.Worker) *Handlers {
 	return &Handlers{
 		service: service,
 		baseURL: baseURL,
@@ -31,7 +32,7 @@ func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, 
 	}
 }
 
-// PostJSON обрабатываем JSON запрос и возвращаем короткую ссылку
+// PostJSON обрабатываем JSON запрос и возвращаем короткую ссылку.
 func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
 	// создаем структуру для сохранения URL
@@ -79,7 +80,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(url.URL, userID)
 	if err != nil {
-		if errors.Is(err, errors2.ErrConflict) {
+		if errors.Is(err, errorscustom.ErrConflict) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusConflict)
 			json.NewEncoder(w).Encode(models.ResultURL{URL: h.ResultBody(encodeURL)})
@@ -109,7 +110,7 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostURL обрабатываем обычный запрос и возвращаем короткую ссылку
+// PostURL обрабатываем обычный запрос и возвращаем короткую ссылку.
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос из body
@@ -141,7 +142,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	// создаем короткую ссылку
 	encodeURL, err := h.service.SaveURL(string(body), userID)
 	if err != nil {
-		if errors.Is(err, errors2.ErrConflict) {
+		if errors.Is(err, errorscustom.ErrConflict) {
 			h.logger.Info("Conflict error: ", logger.ErrAttr(err))
 			// записываем заголовок, статус и короткую ссылку
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -160,7 +161,7 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(h.ResultBody(encodeURL)))
 }
 
-// PostBatchDB записываем запрос в db
+// PostBatchDB записываем запрос в db.
 func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 	var multipleURL []models.MultipleURL
 
@@ -218,7 +219,7 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-// GetURL возвращаем информацию по коротокой ссылке
+// GetURL возвращаем информацию по короткой ссылке.
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 	// читаем запрос по ключу
@@ -233,8 +234,8 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 	//ищем в мапе сохраненный url
 	url, err := h.service.GetURL(shortURL)
 	if err != nil {
-		if errors.Is(err, errors2.ErrDeletedURL) {
-			h.logger.Error("error =", "GET/{id}", errors2.ErrDeletedURL)
+		if errors.Is(err, errorscustom.ErrDeletedURL) {
+			h.logger.Error("error =", "GET/{id}", errorscustom.ErrDeletedURL)
 			w.WriteHeader(http.StatusGone)
 			return
 		}
@@ -249,7 +250,7 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetPing Проверяем подключение к DB
+// GetPing Проверяем подключение к DB.
 func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	if err := h.service.Ping(); err != nil {
 		h.logger.Error("Error = ", logger.ErrAttr(err))
@@ -263,7 +264,7 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
 	if !ok || userID == "" {
-		h.logger.Error("Error = ", logger.ErrAttr(errors2.ErrUserIDNotContext))
+		h.logger.Error("Error = ", logger.ErrAttr(errorscustom.ErrUserIDNotContext))
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -299,6 +300,7 @@ func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeletionURLs делает запрос на удаление из базы.
 func (h *Handlers) DeletionURLs(w http.ResponseWriter, r *http.Request) {
 	var urls []string
 	dec := json.NewDecoder(r.Body)

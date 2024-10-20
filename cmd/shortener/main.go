@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	middleware2 "github.com/go-chi/chi/v5/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
@@ -11,6 +12,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 	"net/http"
+	//_ "net/http/pprof"
 )
 
 func main() {
@@ -28,7 +30,6 @@ func main() {
 	defer repo.Close()
 
 	// инициализируем сервис
-
 	urlService := service.NewService(
 		repo,
 		logs,
@@ -49,7 +50,11 @@ func main() {
 	// инициализировали роутер и создали Post и Get
 	r := chi.NewRouter()
 	r.Use(middleware.WithLogging)
-	r.Group(func(r chi.Router) {
+
+	// Добавляем pprof маршруты вручную
+	r.Mount("/debug", middleware2.Profiler())
+
+	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.GZipMiddleware)
 		r.Use(authorization.AuthMiddleware)
 		r.Post("/", shortHandlers.PostURL)
@@ -60,15 +65,16 @@ func main() {
 	r.Get("/{id}", shortHandlers.GetURL)
 	r.Get("/ping", shortHandlers.GetPing)
 
-	r.Group(func(r chi.Router) {
+	r.Route("/api/user/urls", func(r chi.Router) {
 		r.Use(authorization.CheckAuthMiddleware)
-		r.Get("/api/user/urls", shortHandlers.GetUsersURLs)
-		r.Delete("/api/user/urls", shortHandlers.DeletionURLs)
+		r.Get("/", shortHandlers.GetUsersURLs)
+		r.Delete("/", shortHandlers.DeletionURLs)
 	})
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go worker.StartWorkerDeletion(ctx)
-	go worker.StartErrorListener(ctx)
+
 	// слушаем выбранны порт = configs.AddrServer
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		logs.Error("Err:", logger.ErrAttr(err))
