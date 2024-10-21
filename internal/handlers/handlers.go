@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
@@ -11,8 +14,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
-	"io"
-	"net/http"
 )
 
 type Handlers struct {

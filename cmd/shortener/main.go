@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	_ "net/http/pprof"
+
 	"github.com/go-chi/chi/v5"
 	middleware2 "github.com/go-chi/chi/v5/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
@@ -11,8 +15,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
-	"net/http"
-	//_ "net/http/pprof"
 )
 
 func main() {

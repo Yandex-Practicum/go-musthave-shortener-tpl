@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
-	"net/http"
 )
 
 type contextKey string

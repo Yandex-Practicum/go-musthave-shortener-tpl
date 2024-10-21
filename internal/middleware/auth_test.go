@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"errors"
-	"github.com/golang/mock/gomock"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 )
 
 var (

@@ -3,6 +3,7 @@ package workers
 import (
 	"context"
 	"fmt"
+
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 )
 

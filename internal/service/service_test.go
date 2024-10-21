@@ -1,9 +1,10 @@
 package service
 
 import (
+	"testing"
+
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestNewService(t *testing.T) {

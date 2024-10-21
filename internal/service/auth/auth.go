@@ -2,10 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"time"
 )
 
 const (
@@ -13,8 +14,9 @@ const (
 	tokenSalt  = "tokenPracticum32"
 )
 
-//go:generate mockgen -source=auth.go -destination=mock_auth.go -package=auth
 // AuthService сервис отвечающий за авторизацию и верификацию.
+//
+//go:generate mockgen -source=auth.go -destination=mock_auth.go -package=auth
 type AuthService interface {
 	VerifyUser(token string) (string, error)
 	CreatTokenForUser(userID string) (string, error)

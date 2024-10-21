@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"os"
+
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
 func (s *SaveFile) GetURL(shortURL string) (string, error) {

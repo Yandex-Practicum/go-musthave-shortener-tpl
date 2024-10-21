@@ -3,10 +3,11 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestPstStorage_SaveURL(t *testing.T) {

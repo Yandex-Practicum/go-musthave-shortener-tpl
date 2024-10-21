@@ -6,6 +6,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/mock/gomock"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
@@ -15,10 +20,6 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -2,8 +2,9 @@ package mapstorage
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMapStorage_SaveURL(t *testing.T) {

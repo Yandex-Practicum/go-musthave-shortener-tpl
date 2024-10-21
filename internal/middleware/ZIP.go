@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 	"net/http"
 	"strings"
+
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
 func GZipMiddleware(h http.Handler) http.Handler {

@@ -2,8 +2,9 @@ package mapstorage
 
 import (
 	"errors"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"sync"
+
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
 type MapStorage struct {

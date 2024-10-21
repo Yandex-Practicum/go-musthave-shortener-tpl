@@ -1,14 +1,15 @@
 package service
 
 import (
+	"os"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/mocks"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 func TestGetURL(t *testing.T) {

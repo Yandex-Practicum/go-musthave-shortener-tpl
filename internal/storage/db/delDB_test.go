@@ -2,10 +2,11 @@ package db
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestPstStorage_DeletedURLs(t *testing.T) {

@@ -2,10 +2,11 @@ package db
 
 import (
 	"database/sql"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestPstStorage_CheckURL(t *testing.T) {
