@@ -65,6 +65,6 @@ func (c *Configs) parseFlags() {
 	flag.StringVar(&c.LogLevel, "l", "info", "log level")
 
 	// Флаг -p отвечает за адрес подключения DB
-	flag.StringVar(&c.AddrDB, "d", "postgresql://shortner:123456789@localhost:5432/postgres?sslmode=disable", "address DB")
+	flag.StringVar(&c.AddrDB, "d", "", "address DB")
 	flag.Parse()
 }
