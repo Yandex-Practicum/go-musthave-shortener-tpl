@@ -7,11 +7,13 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
+// MapStorage - хранилище URL-адресов.
 type MapStorage struct {
 	storage map[string]string
 	mu      sync.RWMutex
 }
 
+// NewMapURL возвращает новый хранилище URL-адресов.
 func NewMapURL() *MapStorage {
 	return &MapStorage{
 		storage: make(map[string]string),

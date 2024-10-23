@@ -9,6 +9,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 )
 
+// SecretSalt - соль для шифрования.
 const (
 	SecretSalt = "practicumSecretKey32"
 	tokenSalt  = "tokenPracticum32"
@@ -22,6 +23,7 @@ type AuthService interface {
 	CreatTokenForUser(userID string) (string, error)
 }
 
+// ServiceAuth - сервис для работы с JWT.
 type ServiceAuth struct {
 	passwordSalt []byte
 	tokenSalt    []byte
@@ -30,6 +32,7 @@ type ServiceAuth struct {
 	userStorage    service.Storage
 }
 
+// NewServiceAuth - конструктор для сервиса авторизации.
 func NewServiceAuth(storage service.Storage) *ServiceAuth {
 	return &ServiceAuth{
 		passwordSalt: []byte(SecretSalt),
@@ -65,6 +68,7 @@ func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	return claims.UserID, nil
 }
 
+// CreatTokenForUser создает JWT-токен для пользователя.
 func (sa *ServiceAuth) CreatTokenForUser(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,

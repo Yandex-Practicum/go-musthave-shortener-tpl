@@ -9,20 +9,25 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 )
 
+// ContextKey - ключ для хранения в контексте.
 type contextKey string
 
+// UserIDContextKey - ключ для хранения UserID в контексте.
 const UserIDContextKey contextKey = "user_id"
 
+// AuthMiddleware - middleware для проверки токена.
 type AuthMiddleware struct {
 	authService auth.AuthService
 }
 
+// NewAuthMiddleware - конструктор middleware.
 func NewAuthMiddleware(authService auth.AuthService) *AuthMiddleware {
 	return &AuthMiddleware{
 		authService: authService,
 	}
 }
 
+// GetUserFromContext возвращает UserID из контекста.
 func GetUserFromContext(ctx context.Context) (models.User, bool) {
 	user, ok := ctx.Value(UserIDContextKey).(models.User)
 	return user, ok

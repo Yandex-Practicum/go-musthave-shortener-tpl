@@ -16,6 +16,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 )
 
+// Handlers - обработчики HTTP-запросов
 type Handlers struct {
 	service *service.Service
 	baseURL string
@@ -24,6 +25,7 @@ type Handlers struct {
 	//worker  *workers.WorkerDeleted
 }
 
+// NewHandlers - конструктор обработчиков
 func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, worker workers.Worker) *Handlers {
 	return &Handlers{
 		service: service,
@@ -413,6 +415,7 @@ func (h *Handlers) DeletionURLs(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
+// ResultBody собирает ссылку для возврата в body ответа.
 func (h *Handlers) ResultBody(res string) string {
 	return h.baseURL + "/" + res
 }

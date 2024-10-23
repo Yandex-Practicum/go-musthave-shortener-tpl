@@ -6,14 +6,17 @@ import (
 	"os"
 )
 
+// Count - счетчик для уникального идентификатора.
 var Count int
 
+// Event - структура для хранения событий.
 type Event struct {
 	UUID        int    `json:"uuid"`
 	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 }
 
+// SaveFile - структура для хранения в файле.
 type SaveFile struct {
 	file    *os.File
 	encoder *json.Encoder
@@ -60,6 +63,7 @@ func (s *SaveFile) Ping() error {
 	return nil
 }
 
+// ReadFile - структура для чтения из файла.
 type ReadFile struct {
 	file    *os.File
 	decoder *json.Decoder

@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// уровни логирования.
 const (
 	defaultLevel      = LevelInfo
 	defaultAddSource  = false
@@ -46,6 +47,7 @@ func NewLogger(opts ...LoggerOprion) *Logger {
 	return logger
 }
 
+// LoggerOptions структура для опций логгера.
 type LoggerOptions struct {
 	Level      Level
 	AddSource  bool
@@ -53,6 +55,7 @@ type LoggerOptions struct {
 	SetDefault bool
 }
 
+// LoggerOprion опция логгера.
 type LoggerOprion func(options *LoggerOptions)
 
 // WithLevel устанавливает уровень логирования.
