@@ -18,6 +18,7 @@ func NewMapURL() *MapStorage {
 	}
 }
 
+// SaveURL сохраняет URL в хранилище.
 func (s *MapStorage) SaveURL(shortURL, url, userID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -29,6 +30,7 @@ func (s *MapStorage) SaveURL(shortURL, url, userID string) error {
 	return nil
 }
 
+// GetURL возвращает URL из хранилища.
 func (s *MapStorage) GetURL(shortURL string) (string, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -38,18 +40,22 @@ func (s *MapStorage) GetURL(shortURL string) (string, error) {
 	return s.storage[shortURL], nil
 }
 
+// Close закрывает хранилище.
 func (s *MapStorage) Close() error {
 	return nil
 }
 
+// Ping проверяет соединение с хранилищем.
 func (s *MapStorage) Ping() error {
 	return nil
 }
 
+// SaveSliceOfDB сохраняет срез URL в хранилище.
 func (s *MapStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	return nil, nil
 }
 
+// GetAllURL возвращает срез URL из хранилища.
 func (s *MapStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
 	return nil, errors.New("not use GetAllURL in map")
 }

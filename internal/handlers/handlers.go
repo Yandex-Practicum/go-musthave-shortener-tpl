@@ -33,6 +33,19 @@ func NewHandlers(service *service.Service, baseURL string, sLog *logger.Logger, 
 	}
 }
 
+// PostJSON godoc
+// @Tags POST
+// @Summary Create new short URL from JSON request
+// @Description Create a short URL based on the given JSON payload
+// @Accept json
+// @Produce json
+// @Param url body models.URL true "URL to shorten"
+// @Success 201 "Created"
+// @Failure 400 "Bad request"
+// @Failure 404 "URL not found"
+// @Failure 409 "Conflict"
+// @Failure 500 "Internal server error"
+// @Router /api/shorten [post]
 // PostJSON обрабатываем JSON запрос и возвращаем короткую ссылку.
 func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 
@@ -111,6 +124,19 @@ func (h *Handlers) PostJSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostURL godoc
+// @Tags POST
+// @Summary Create new short URL from URL
+// @Description Create a short URL based on the given URL
+// @Accept plain
+// @Produce plain
+// @Param url body string true "URL to shorten"
+// @Success 201 "Created"
+// @Failure 400 "Bad request"
+// @Failure 404 "URL not found"
+// @Failure 409 "Conflict"
+// @Failure 500 "Internal server error"
+// @Router / [post]
 // PostURL обрабатываем обычный запрос и возвращаем короткую ссылку.
 func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 
@@ -162,6 +188,18 @@ func (h *Handlers) PostURL(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(h.ResultBody(encodeURL)))
 }
 
+// PostBatchDB godoc
+// @Tags POST
+// @Summary Create new short URL from URL
+// @Description Create a short URL based on the given URL
+// @Accept json
+// @Produce json
+// @Param url body []models.MultipleURL true "URL to shorten"
+// @Success 201 "Created"
+// @Failure 400 "Bad request"
+// @Failure 404 "Not found"
+// @Failure 500 "Internal server error"
+// @Router /api/shorten/batch [post]
 // PostBatchDB записываем запрос в db.
 func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 	var multipleURL []models.MultipleURL
@@ -220,6 +258,19 @@ func (h *Handlers) PostBatchDB(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+// GetURL godoc
+// @Tags GET
+// @Summary Get short URL
+// @Description Get short URL
+// @Accept json
+// @Produce json
+// @Param id path string true "Short URL"
+// @Success 307 "Temporary redirect"
+// @Header 307 {string} Location "URL новой записи"
+// @Failure 404 "Not found"
+// @Failure 405 "Method not allowed"
+// @Failure 410 "Gone"
+// @Router /{id} [get]
 // GetURL возвращаем информацию по короткой ссылке.
 func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
@@ -251,6 +302,15 @@ func (h *Handlers) GetURL(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetPing godoc
+// @Tags GET
+// @Summary Check DB connection
+// @Description Check DB connection
+// @Accept plain
+// @Produce plain
+// @Success 200 "OK"
+// @Failure 500 "Internal server error"
+// @Router /ping [get]
 // GetPing Проверяем подключение к DB.
 func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	if err := h.service.Ping(); err != nil {
@@ -262,6 +322,20 @@ func (h *Handlers) GetPing(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetUsersURLs godoc
+// @Tags GET
+// @Summary Get user URLs
+// @Description Get user URLs
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Success 204 "No content"
+// @Failure 400 "Bad request"
+// @Failure 401 "Unauthorized"
+// @Failure 500 "Internal server error"
+// @Router /api/user/urls [get]
+// GetUsersURLs возвращаем все сохраненные URL пользователя.
 func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDContextKey).(string)
 	if !ok || userID == "" {
@@ -301,6 +375,17 @@ func (h *Handlers) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeletionURLs godoc
+// @Tags DELETE
+// @Summary Delete user URLs
+// @Description Delete user URLs
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param urls body []string true "URLs"
+// @Success 202 "Accepted"
+// @Failure 500 "Internal server error"
+// @Router /api/user/urls [delete]
 // DeletionURLs делает запрос на удаление из базы.
 func (h *Handlers) DeletionURLs(w http.ResponseWriter, r *http.Request) {
 	var urls []string

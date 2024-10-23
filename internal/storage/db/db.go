@@ -41,7 +41,7 @@ func (p *PstStorage) initDB(dataSourceName string) error {
 	return nil
 }
 
-// Функция для создания таблицы, если она не существует
+// CreateTableIfNotExists функция для создания таблицы, если она не существует
 func (p *PstStorage) CreateTableIfNotExists() error {
 	db, err := p.storage.Begin()
 	if err != nil {

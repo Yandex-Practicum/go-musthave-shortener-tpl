@@ -30,6 +30,7 @@ func NewWorkerDeleted(storage *service.Service) *WorkerDeleted {
 	}
 }
 
+// StartWorkerDeletion стартует воркер для удаления URL из хранилища.
 func (w *WorkerDeleted) StartWorkerDeletion(ctx context.Context) {
 	for {
 		select {
@@ -41,6 +42,7 @@ func (w *WorkerDeleted) StartWorkerDeletion(ctx context.Context) {
 	}
 }
 
+// processDeletion обрабатывает удаление URL из хранилища.
 func (w *WorkerDeleted) processDeletion(ctx context.Context, req DeletionRequest) {
 	if err := w.storage.DeletedURLs(req.URLs, req.User); err != nil {
 		select {
@@ -51,6 +53,7 @@ func (w *WorkerDeleted) processDeletion(ctx context.Context, req DeletionRequest
 	}
 }
 
+// StartErrorListener обрабатывает ошибки воркера.
 func (w *WorkerDeleted) StartErrorListener(ctx context.Context) {
 	for {
 		select {
@@ -63,6 +66,7 @@ func (w *WorkerDeleted) StartErrorListener(ctx context.Context) {
 	}
 }
 
+// SendDeletionRequestToWorker отправляет запрос на удаление URL из хранилища.
 func (w *WorkerDeleted) SendDeletionRequestToWorker(req DeletionRequest) error {
 	select {
 	case deleteQueue <- req:

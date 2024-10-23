@@ -7,6 +7,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
+// GZipMiddleware - middleware для сжатия ответа.
 func GZipMiddleware(h http.Handler) http.Handler {
 	GZip := func(w http.ResponseWriter, r *http.Request) {
 		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,

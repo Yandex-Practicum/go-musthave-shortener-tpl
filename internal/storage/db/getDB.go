@@ -9,6 +9,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
+// GetURL возвращает оригинальную ссылку по короткой ссылке.
 func (p *PstStorage) GetURL(shortURL string) (string, error) {
 	var originalURL string
 	var deletedURL bool
@@ -34,6 +35,7 @@ func (p *PstStorage) GetURL(shortURL string) (string, error) {
 	return originalURL, nil
 }
 
+// GetAllURL возвращает все сохраненные ссылки пользователя.
 func (p *PstStorage) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
 	var userURLs []*models.UserURLs
 	tx, err := p.storage.Begin()

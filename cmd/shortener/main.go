@@ -15,45 +15,63 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service/auth"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
+
+	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+//@title URL Shortener API
+//@version 1.0
+//@description API Server for shortener
+
+//@host localhost:8080
+//@BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
-	// инициализируем конфиг
+	// инициализируем конфиг.
 	configs := NewConfigs()
 	configs.Parse()
 
-	// инициализируем logger
+	// инициализируем logger.
 	logs := logger.NewLogger(logger.WithLevel(configs.LogLevel))
 	logs.Info("Start logger")
 
-	// инициализируем хранилище
+	// инициализируем хранилище.
 	repo := initDB(configs.AddrDB, configs.PathFile)
 	logs.Info("Connecting DB")
 	defer repo.Close()
 
-	// инициализируем сервис
+	// инициализируем сервис.
 	urlService := service.NewService(
 		repo,
 		logs,
 	)
 	logs.Info(("Service created"))
 
-	// инициализируем проверку авторизацию
+	// инициализируем проверку авторизацию.
 	serviceAuth := auth.NewServiceAuth(repo)
 	authorization := middleware.NewAuthMiddleware(serviceAuth)
 
-	// инициализируем worker
+	// инициализируем worker.
 	worker := workers.NewWorkerDeleted(urlService)
 
-	// передаем в хенлер сервис и baseURL
+	// передаем в хенлер сервис и baseURL.
 	shortHandlers := handlers.NewHandlers(urlService, configs.BaseURL, logs, worker)
 	logs.Info(fmt.Sprintf("Handlers created PORT: %s", configs.AddrServer))
 
-	// инициализировали роутер и создали Post и Get
+	// инициализировали роутер и создали Post и Get.
 	r := chi.NewRouter()
 	r.Use(middleware.WithLogging)
 
-	// Добавляем pprof маршруты вручную
+	// Swagger route.
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+
+	// Добавляем pprof маршруты вручную.
 	r.Mount("/debug", middleware2.Profiler())
 
 	r.Route("/", func(r chi.Router) {
@@ -77,7 +95,7 @@ func main() {
 	defer cancel()
 	go worker.StartWorkerDeletion(ctx)
 
-	// слушаем выбранны порт = configs.AddrServer
+	// слушаем выбранны порт = configs.AddrServer.
 	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
 		logs.Error("Err:", logger.ErrAttr(err))
 	}

@@ -4,6 +4,7 @@ import (
 	"sync"
 )
 
+// FanIn объединяет все каналы в один канал.
 func FanIn(doneCh chan struct{}, sliceURLs []string) chan string {
 	// Создаем выходной канал для объединения всех результатов.
 	outCh := make(chan string, len(sliceURLs))

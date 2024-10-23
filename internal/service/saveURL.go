@@ -6,6 +6,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
+// SaveURL сохраняет URL в базе
 func (s *Service) SaveURL(url, userID string) (string, error) {
 
 	// проверяем есть ли в базе уже данный URL

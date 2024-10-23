@@ -14,12 +14,12 @@ type Configs struct {
 	AddrDB     string
 }
 
-// NewConfigs конструктор конфига
+// NewConfigs конструктор конфига.
 func NewConfigs() *Configs {
 	return &Configs{}
 }
 
-// Parse проверка зависимостей и перезапись Configs
+// Parse проверка зависимостей и перезапись Configs.
 func (c *Configs) Parse() {
 	c.parseFlags()
 
@@ -48,7 +48,7 @@ func (c *Configs) Parse() {
 
 }
 
-// parseFlags флаги которые можно задать при запуске
+// parseFlags флаги которые можно задать при запуске.
 func (c *Configs) parseFlags() {
 
 	// Флаг -a отвечает за адрес запуска HTTP-сервера (значение может быть таким: localhost:8080).
@@ -65,6 +65,6 @@ func (c *Configs) parseFlags() {
 	flag.StringVar(&c.LogLevel, "l", "info", "log level")
 
 	// Флаг -p отвечает за адрес подключения DB
-	flag.StringVar(&c.AddrDB, "d", "", "address DB")
+	flag.StringVar(&c.AddrDB, "d", "postgresql://shortner:123456789@localhost:5432/postgres?sslmode=disable", "address DB")
 	flag.Parse()
 }

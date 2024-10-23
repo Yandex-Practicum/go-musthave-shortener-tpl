@@ -10,6 +10,7 @@ const (
 	letterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
+// EncodeURL - кодируем URL.
 func EncodeURL(url string) (string, error) {
 
 	b := make([]byte, lengthShortURL)

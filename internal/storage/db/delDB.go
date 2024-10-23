@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// DeletedURLs удаляет URL из базы данных.
 func (p *PstStorage) DeletedURLs(urls []string, userID string) error {
 	if len(urls) == 0 {
 		return nil

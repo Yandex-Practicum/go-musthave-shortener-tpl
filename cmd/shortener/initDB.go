@@ -9,7 +9,7 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 )
 
-// initDB инициализация базы
+// initDB инициализация базы.
 func initDB(addrDB, pathFile string) service.Storage {
 
 	if addrDB != "" {

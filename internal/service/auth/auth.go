@@ -40,6 +40,15 @@ func NewServiceAuth(storage service.Storage) *ServiceAuth {
 	}
 }
 
+// VerifyUser godoc
+// @Tags AUTH_SERVICE
+// @Summary Verify user
+// @Description Verify user
+// @Param VerifyUser body string true "token"
+// @Success 200
+// @Failure 500 "Internal server error"
+// @Router / [options]
+// VerifyUser проверяет наличие токена в заголовке Authorization.
 func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	claims := &models.Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {

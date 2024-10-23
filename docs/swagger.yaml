@@ -1,0 +1,252 @@
+basePath: /
+definitions:
+  models.MultipleURL:
+    properties:
+      correlation_id:
+        type: string
+      original_url:
+        type: string
+    type: object
+  models.URL:
+    properties:
+      url:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for shortener
+  title: URL Shortener API
+  version: "1.0"
+paths:
+  /:
+    options:
+      description: Verify user
+      parameters:
+      - description: token
+        in: body
+        name: VerifyUser
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal server error
+      summary: Verify user
+      tags:
+      - AUTH_SERVICE
+    patch:
+      description: Auth middleware
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal server error
+      summary: Auth middleware
+      tags:
+      - MIDDLEWARE
+    post:
+      consumes:
+      - text/plain
+      description: Create a short URL based on the given URL
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: url
+        required: true
+        schema:
+          type: string
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad request
+        "404":
+          description: URL not found
+        "409":
+          description: Conflict
+        "500":
+          description: Internal server error
+      summary: Create new short URL from URL
+      tags:
+      - POST
+  /{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get short URL
+      parameters:
+      - description: Short URL
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Temporary redirect
+          headers:
+            Location:
+              description: URL новой записи
+              type: string
+        "404":
+          description: Not found
+        "405":
+          description: Method not allowed
+        "410":
+          description: Gone
+      summary: Get short URL
+      tags:
+      - GET
+  /api/shorten:
+    post:
+      consumes:
+      - application/json
+      description: Create a short URL based on the given JSON payload
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: url
+        required: true
+        schema:
+          $ref: '#/definitions/models.URL'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad request
+        "404":
+          description: URL not found
+        "409":
+          description: Conflict
+        "500":
+          description: Internal server error
+      summary: Create new short URL from JSON request
+      tags:
+      - POST
+  /api/shorten/batch:
+    post:
+      consumes:
+      - application/json
+      description: Create a short URL based on the given URL
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: url
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.MultipleURL'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+      summary: Create new short URL from URL
+      tags:
+      - POST
+  /api/user/urls:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user URLs
+      parameters:
+      - description: URLs
+        in: body
+        name: urls
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal server error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user URLs
+      tags:
+      - DELETE
+    get:
+      consumes:
+      - application/json
+      description: Get user URLs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "204":
+          description: No content
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      security:
+      - ApiKeyAuth: []
+      summary: Get user URLs
+      tags:
+      - GET
+    patch:
+      description: Check auth middleware
+      parameters:
+      - description: user_id
+        in: header
+        name: CheckAuthMiddleware
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+      summary: Check auth middleware
+      tags:
+      - MIDDLEWARE
+  /ping:
+    get:
+      consumes:
+      - text/plain
+      description: Check DB connection
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal server error
+      summary: Check DB connection
+      tags:
+      - GET
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
