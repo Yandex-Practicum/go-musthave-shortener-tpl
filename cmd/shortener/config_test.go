@@ -47,6 +47,7 @@ func TestParse(t *testing.T) {
 				t.Errorf("Ожидали %v, пришли %v", tt.pathFile, cfg.PathFile)
 			}
 			if cfg.AddrDB != tt.addrDB {
+				t.Errorf("Ожидали %v, пришли %v", tt.addrDB, cfg.AddrDB)
 			}
 		})
 	}
