@@ -7,6 +7,13 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
+// IMapStorage - интерфейс хранилища URL-адресов.
+type IMapStorage interface {
+	SaveURL(shortURL, url, userID string) error
+	GetURL(shortURL string) (string, error)
+	Close() error
+}
+
 // MapStorage - хранилище URL-адресов.
 type MapStorage struct {
 	storage map[string]string

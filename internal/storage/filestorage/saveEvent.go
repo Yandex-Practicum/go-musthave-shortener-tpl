@@ -6,6 +6,13 @@ import (
 	"os"
 )
 
+// IFileStorage - интерфейс для хранения в файле.
+type IFileStorage interface {
+	SaveURL(shortURL, originalURL, userID string) error
+	GetURL(shortURL string) (string, error)
+	Close() error
+}
+
 // Count - счетчик для уникального идентификатора.
 var Count int
 

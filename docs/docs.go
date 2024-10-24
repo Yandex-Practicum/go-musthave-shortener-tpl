@@ -318,6 +318,23 @@ const docTemplate = `{
                 }
             }
         },
+        "/pprof/...": {
+            "get": {
+                "description": "Pprof middleware - work only location",
+                "tags": [
+                    "MIDDLEWARE"
+                ],
+                "summary": "Pprof middleware",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    }
+                }
+            }
+        },
         "/{id}": {
             "get": {
                 "description": "Get short URL",

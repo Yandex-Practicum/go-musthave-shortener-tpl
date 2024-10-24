@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -56,7 +57,7 @@ func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	claims := &models.Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("incorrect method")
+			return nil, errorscustom.ErrBadVarifyToken
 		}
 
 		return sa.passwordSalt, nil

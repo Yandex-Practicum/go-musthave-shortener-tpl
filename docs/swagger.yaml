@@ -244,6 +244,17 @@ paths:
       summary: Check DB connection
       tags:
       - GET
+  /pprof/...:
+    get:
+      description: Pprof middleware - work only location
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: Access denied
+      summary: Pprof middleware
+      tags:
+      - MIDDLEWARE
 securityDefinitions:
   ApiKeyAuth:
     in: header
