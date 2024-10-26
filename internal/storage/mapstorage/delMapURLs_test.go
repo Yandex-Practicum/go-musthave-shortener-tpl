@@ -1,7 +1,6 @@
 package mapstorage
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -12,6 +11,6 @@ func TestMapStorage_DeletedURLs(t *testing.T) {
 	testURLs = append(testURLs, "www")
 	err := storage.DeletedURLs(testURLs, "test")
 	if err == nil {
-		fmt.Errorf("no way")
+		t.Error("no way")
 	}
 }

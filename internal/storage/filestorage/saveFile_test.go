@@ -1,7 +1,6 @@
 package filestorage
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -10,7 +9,7 @@ import (
 func TestSaveFile_SaveURL(t *testing.T) {
 	storage, err := NewSaveFile("testStorage.txt")
 	if err != nil {
-		fmt.Errorf("problam create test file")
+		t.Error("problam create test file")
 	}
 
 	shortURL := "qwert"
@@ -20,7 +19,7 @@ func TestSaveFile_SaveURL(t *testing.T) {
 	err = storage.SaveURL(shortURL, originURL, userID)
 
 	if err != nil {
-		fmt.Errorf("problam save url")
+		t.Error("problam save url")
 	}
 	os.Remove("testStorage.txt")
 }
