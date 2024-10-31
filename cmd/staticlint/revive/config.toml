@@ -1,0 +1,13 @@
+ignoreGeneratedHeader = true
+severity = "warning"
+
+[rule.blank-imports]
+  message = "blank imports are discouraged"
+
+[rule.var-naming]
+  length = "3,50"
+  severity = "error"
+
+[rule.line-length-limit]
+  arguments = [120]
+  severity = "warning"

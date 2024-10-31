@@ -29,6 +29,9 @@ func TestEncodeURL(t *testing.T) {
 func BenchmarkEncodeURL(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		EncodeURL("https://example.com")
+		_, err := EncodeURL("https://example.com")
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 }

@@ -122,9 +122,9 @@ func (mr *MockStorageMockRecorder) Ping() *gomock.Call {
 }
 
 // SaveSliceOfDB mocks base method.
-func (m *MockStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
+func (m *MockStorage) SaveSlice(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveSliceOfDB", urls, baseURL, userID)
+	ret := m.ctrl.Call(m, "SaveSlice", urls, baseURL, userID)
 	ret0, _ := ret[0].([]models.ResultMultipleURL)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -133,7 +133,7 @@ func (m *MockStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID s
 // SaveSliceOfDB indicates an expected call of SaveSliceOfDB.
 func (mr *MockStorageMockRecorder) SaveSliceOfDB(urls, baseURL, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSliceOfDB", reflect.TypeOf((*MockStorage)(nil).SaveSliceOfDB), urls, baseURL, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSlice", reflect.TypeOf((*MockStorage)(nil).SaveSlice), urls, baseURL, userID)
 }
 
 // SaveURL mocks base method.

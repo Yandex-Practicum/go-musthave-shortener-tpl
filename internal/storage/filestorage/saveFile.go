@@ -38,6 +38,6 @@ func (s *SaveFile) SaveURL(shortURL, originalURL, userID string) error {
 }
 
 // SaveSliceOfDB - функция для записи в файл.
-func (s *SaveFile) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
+func (s *SaveFile) SaveSlice(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	return nil, nil
 }
