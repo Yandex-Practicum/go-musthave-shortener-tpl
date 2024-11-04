@@ -1,0 +1,36 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.x' # Укажите нужную версию Go
+
+      - name: Run tests and generate coverage report
+        run: |
+          go test ./... -coverprofile=coverage.out
+          go get -u github.com/axw/gocov/gocov
+          go get -u github.com/AlekSi/gocov-xml
+          gocov convert coverage.out | gocov-xml > coverage.xml
+
+      - name: Upload coverage to Codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: curl -s https://codecov.io/upload/v2 -F "token=$CODECOV_TOKEN" -F "file=@coverage.xml" -F "commit=${{ github.sha }}" -F "branch=${{ github.ref_name }}"
+
+      - name: Add coverage badge to README.md
+        if: always()
+        run: echo "[![Coverage Status](https://codecov.io/gh/${{ github.repository }}/badge.svg?branch=${{ github.event.pull_request.head.ref || github.ref }})](https://codecov.io/gh/${{ github.repository }})" >> README.md

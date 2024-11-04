@@ -32,7 +32,18 @@ import (
 // @in header
 // @name Authorization
 
+var (
+	BuildVersion = "N/A"
+	BuildDate    = "N/A"
+	BuildCommit  = "N/A"
+)
+
 func main() {
+	// выводит глобальную информацию
+	fmt.Printf("Build version: %s\n", BuildVersion)
+	fmt.Printf("Build date: %s\n", BuildDate)
+	fmt.Printf("Build commit: %s\n", BuildCommit)
+
 	// инициализируем конфиг.
 	configs := NewConfigs()
 	configs.Parse()
