@@ -32,6 +32,9 @@ import (
 // @in header
 // @name Authorization
 
+// BuildVersion = определяет версию приложения
+// BuildDate = определяет дату сборки
+// BuildCommit = определяет коммит сборки
 var (
 	BuildVersion = "N/A"
 	BuildDate    = "N/A"
