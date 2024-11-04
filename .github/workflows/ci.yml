@@ -17,7 +17,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.22.3'
+          go-version: '1.22.3'  # Укажите вашу версию Go
 
       - name: Install dependencies
         run: go mod tidy
@@ -31,3 +31,4 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           file: coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}  # Используйте секрет для токена
