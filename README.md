@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/kamencov/go-musthave-shortener-tpl/branch/main/graph/badge.svg)](https://codecov.io/gh/kamencov/go-musthave-shortener-tpl)
+
 # go-musthave-shortener-tpl
 
 Шаблон репозитория для трека «Сервис сокращения URL».
