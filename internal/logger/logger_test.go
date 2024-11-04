@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"context"
 	"reflect"
 	"testing"
 )
@@ -121,5 +122,28 @@ func TestWithSetDefault(t *testing.T) {
 	// Проверяем, что SetDefault обновился до false
 	if options.SetDefault {
 		t.Errorf("expected SetDefault to be false, got %v", options.SetDefault)
+	}
+}
+
+// Тест для функции WithAttr
+func TestWithAttr(t *testing.T) {
+	ctx := context.Background()
+	logger := WithAttr(ctx, Attr{
+		Key:   "key",
+		Value: Value{},
+	})
+	if logger == nil {
+		t.Errorf("expected logger to be not nil, got nil")
+	}
+}
+
+// Тест для функции WithDefaultAttrs
+func TestWithDefaultAttrs(t *testing.T) {
+	logger := WithDefaultAttrs(Default(), Attr{
+		Key:   "key",
+		Value: Value{},
+	})
+	if logger == nil {
+		t.Errorf("expected logger to be not nil, got nil")
 	}
 }
