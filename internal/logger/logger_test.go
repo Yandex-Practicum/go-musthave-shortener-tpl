@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+func TestNewLogger(t *testing.T) {
+	tests := []struct {
+		name string
+		opts LoggerOprion
+	}{
+		{
+			name: "test_new_logger",
+			opts: func(options *LoggerOptions) {},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewLogger(tt.opts); got == nil {
+				t.Errorf("NewLogger() = %v, want %v", got, tt.opts)
+			}
+		})
+	}
+}
+
 func TestDefault(t *testing.T) {
 	tests := []struct {
 		name string
