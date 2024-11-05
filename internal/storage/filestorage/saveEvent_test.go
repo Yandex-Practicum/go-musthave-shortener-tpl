@@ -31,4 +31,12 @@ func TestNewSaveFile(t *testing.T) {
 
 		})
 	}
+
+	t.Run("no_open_file", func(t *testing.T) {
+		_, err := NewSaveFile("")
+		if err == nil {
+			t.Errorf("NewSaveFile() error = %v, wantErr %v", err, true)
+			return
+		}
+	})
 }
