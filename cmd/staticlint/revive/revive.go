@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// RunRevive запускает revive и возвращает вывод и ошибку.
 func RunRevive() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
