@@ -10,6 +10,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/printf"
 	"golang.org/x/tools/go/analysis/passes/shadow"
 	"golang.org/x/tools/go/analysis/passes/structtag"
+	"honnef.co/go/tools/simple"
 	"honnef.co/go/tools/staticcheck"
 	"log"
 	"strings"
@@ -31,8 +32,8 @@ func configureAnalyzers() []*analysis.Analyzer {
 		}
 	}
 
-	for _, a := range staticcheck.Analyzers {
-		if a.Analyzer.Name == "ST1000" {
+	for _, a := range simple.Analyzers {
+		if a.Analyzer.Name == "S1005" || a.Analyzer.Name == "S1006" {
 			analyzers = append(analyzers, a.Analyzer)
 			break
 		}
