@@ -6,19 +6,30 @@ import (
 	"os"
 )
 
+// IFileStorage - интерфейс для хранения в файле.
+type IFileStorage interface {
+	SaveURL(shortURL, originalURL, userID string) error
+	GetURL(shortURL string) (string, error)
+	Close() error
+}
+
+// Count - счетчик для уникального идентификатора.
 var Count int
 
+// Event - структура для хранения событий.
 type Event struct {
 	UUID        int    `json:"uuid"`
 	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 }
 
+// SaveFile - структура для хранения в файле.
 type SaveFile struct {
 	file    *os.File
 	encoder *json.Encoder
 }
 
+// NewSaveFile создает новый SaveFile.
 func NewSaveFile(filePath string) (*SaveFile, error) {
 	// откройте файл и создайте для него json.Encoder
 	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
@@ -44,23 +55,28 @@ func NewSaveFile(filePath string) (*SaveFile, error) {
 	}, nil
 }
 
+// WriteSaveModel добавляет Event в файл.
 func (s *SaveFile) WriteSaveModel(event *Event) error {
 	return s.encoder.Encode(&event)
 }
 
+// Close закрывает файл.
 func (s *SaveFile) Close() error {
 	return s.file.Close()
 }
 
+// Ping проверяет соединение с файлом.
 func (s *SaveFile) Ping() error {
 	return nil
 }
 
+// ReadFile - структура для чтения из файла.
 type ReadFile struct {
 	file    *os.File
 	decoder *json.Decoder
 }
 
+// NewReadFile создает новый ReadFile.
 func NewReadFile(filename string) (*ReadFile, error) {
 	// откройте файл и создайте для него json.Decoder
 	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
@@ -75,6 +91,7 @@ func NewReadFile(filename string) (*ReadFile, error) {
 
 }
 
+// ReadEvent читает Event из файл.
 func (c *ReadFile) ReadEvent() (*Event, error) {
 	// добавьте вызов Decode для чтения и десериализации
 
@@ -86,6 +103,7 @@ func (c *ReadFile) ReadEvent() (*Event, error) {
 	return event, nil
 }
 
+// Close закрывает файл.
 func (c *ReadFile) Close() error {
 	return c.file.Close()
 }

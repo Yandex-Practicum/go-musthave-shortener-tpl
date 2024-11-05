@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/utils"
 )
 
+// SaveURL сохраняет URL в базе данных.
 func (p *PstStorage) SaveURL(shortURL, originalURL, userID string) error {
 	var user *string
 	if userID != "" {
@@ -30,6 +32,7 @@ func (p *PstStorage) SaveURL(shortURL, originalURL, userID string) error {
 	return tx.Commit()
 }
 
+// SaveSliceOfDB сохраняет множество URL в базе данных.
 func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	var resultMultipleURL []models.ResultMultipleURL
 

@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errors"
+
+	errors2 "github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
 )
 
+// CheckURL - проверяет есть ли в базе уже данный URL.
 func (p *PstStorage) CheckURL(originalURL string) (string, error) {
 	var shortURL string
 
@@ -19,6 +21,7 @@ func (p *PstStorage) CheckURL(originalURL string) (string, error) {
 	return shortURL, errors2.ErrConflict
 }
 
+// CheckUser - проверяет есть ли в базе уже данный пользователь.
 func (p *PstStorage) CheckUser(user string) error {
 
 	if row := p.storage.QueryRowContext(context.Background(),

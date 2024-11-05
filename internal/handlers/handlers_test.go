@@ -3,16 +3,23 @@ package handlers
 import (
 	"bytes"
 	"context"
-	"github.com/go-chi/chi/v5"
-	"github.com/golang/mock/gomock"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/mocks"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
+	"database/sql"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/golang/mock/gomock"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/mocks"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/workers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -30,6 +37,8 @@ func TestPostURL(t *testing.T) {
 	t.Run("test_post_URL", func(t *testing.T) {
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
+		ctx := context.WithValue(rRequest.Context(), middleware.UserIDContextKey, "userID")
+		rRequest = rRequest.WithContext(ctx)
 		wResonse := httptest.NewRecorder()
 
 		shortHandlers.PostURL(wResonse, rRequest)
@@ -71,6 +80,8 @@ func TestHandlersPostJSON(t *testing.T) {
 		payload := "{\"url\": \"https://practicum.yandex.ru\"}"
 		param := strings.NewReader(payload)
 		rRequest := httptest.NewRequest("POST", "/", param)
+		ctx := context.WithValue(rRequest.Context(), middleware.UserIDContextKey, "userID")
+		rRequest = rRequest.WithContext(ctx)
 		wResonse := httptest.NewRecorder()
 
 		shortHandlers.PostJSON(wResonse, rRequest)
@@ -84,6 +95,8 @@ func TestHandlersPostJSON(t *testing.T) {
 		payload := ""
 		param := strings.NewReader(payload)
 		rRequest := httptest.NewRequest("POST", "/", param)
+		ctx := context.WithValue(rRequest.Context(), middleware.UserIDContextKey, "userID")
+		rRequest = rRequest.WithContext(ctx)
 		wResonse := httptest.NewRecorder()
 
 		shortHandlers.PostJSON(wResonse, rRequest)
@@ -105,6 +118,8 @@ func TestGetURL(t *testing.T) {
 
 		payload := []byte("http://example.com")
 		rRequest := httptest.NewRequest("POST", "/url", bytes.NewBuffer(payload))
+		ctx := context.WithValue(rRequest.Context(), middleware.UserIDContextKey, "userID")
+		rRequest = rRequest.WithContext(ctx)
 		wResonse := httptest.NewRecorder()
 
 		shortHandlers.PostURL(wResonse, rRequest)
@@ -169,43 +184,45 @@ func TestGetPing(t *testing.T) {
 	}
 }
 
-//func TestPostBatchDB_Success(t *testing.T) {
-//	testURL := "https://youtube.com"
-//
-//	multipleURL := models.MultipleURL{
-//		CorrelationID: "1",
-//		OriginalURL:   testURL,
-//	}
-//
-//	marsh, err := json.Marshal([]models.MultipleURL{multipleURL})
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	buf := bytes.NewReader(marsh)
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	mockPostgre := mocks.NewMockStorage(ctrl)
-//	mockPostgre.EXPECT().CheckURL(testURL).Return("", nil)
-//	mockPostgre.EXPECT().SaveURL(gomock.Any(), testURL).Return(nil)
-//
-//	logger := logger.NewLogger(logger.WithLevel("info"))
-//
-//	service := service.NewService(mockPostgre, logger)
-//	handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
-//
-//	req, err := http.NewRequest("POST", "/api/shorten/batch", buf)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	w := httptest.NewRecorder()
-//	handlers.PostBatchDB(w, req)
-//
-//	if w.Code != http.StatusCreated {
-//		t.Errorf("ожидался статус %d, но получен %d", http.StatusCreated, w.Code)
-//	}
-//}
+func TestPostBatchDB_Success(t *testing.T) {
+	testURL := "https://youtube.com"
+
+	multipleURL := models.MultipleURL{
+		CorrelationID: "1",
+		OriginalURL:   testURL,
+	}
+
+	reseltMultip := []models.ResultMultipleURL{}
+
+	marsh, err := json.Marshal([]models.MultipleURL{multipleURL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf := bytes.NewReader(marsh)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockPostgre := mocks.NewMockStorage(ctrl)
+	mockPostgre.EXPECT().SaveSliceOfDB(gomock.Any(), gomock.Any(), gomock.Any()).Return(reseltMultip, nil)
+	logger := logger.NewLogger(logger.WithLevel("info"))
+
+	service := service.NewService(mockPostgre, logger)
+	handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
+
+	req, err := http.NewRequest("POST", "/api/shorten/batch", buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.WithValue(req.Context(), middleware.UserIDContextKey, "userID")
+	req = req.WithContext(ctx)
+
+	w := httptest.NewRecorder()
+	handlers.PostBatchDB(w, req)
+
+	if w.Code != http.StatusCreated {
+		t.Errorf("ожидался статус %d, но получен %d", http.StatusCreated, w.Code)
+	}
+}
 
 func TestPostBatchDB_InCorrectRequest(t *testing.T) {
 
@@ -224,6 +241,8 @@ func TestPostBatchDB_InCorrectRequest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	ctx := context.WithValue(req.Context(), middleware.UserIDContextKey, "userID")
+	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
 	handlers.PostBatchDB(w, req)
@@ -233,44 +252,47 @@ func TestPostBatchDB_InCorrectRequest(t *testing.T) {
 	}
 }
 
-//func TestPostBatchDB_StorageError(t *testing.T) {
-//	testURL := "https://youtube.com"
-//
-//	multipleURL := models.MultipleURL{
-//		CorrelationID: "1",
-//		OriginalURL:   testURL,
-//	}
-//
-//	marsh, err := json.Marshal([]models.MultipleURL{multipleURL})
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	buf := bytes.NewReader(marsh)
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	mockPostgre := mocks.NewMockStorage(ctrl)
-//	mockErr := errors.New("Some error")
-//	mockPostgre.EXPECT().CheckURL(testURL).Return("", nil)
-//	mockPostgre.EXPECT().SaveURL(gomock.Any(), testURL).Return(mockErr)
-//
-//	logger := logger.NewLogger(logger.WithLevel("info"))
-//
-//	service := service.NewService(mockPostgre, logger)
-//	handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
-//
-//	req, err := http.NewRequest("POST", "/api/shorten/batch", buf)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	w := httptest.NewRecorder()
-//	handlers.PostBatchDB(w, req)
-//
-//	if w.Code != http.StatusInternalServerError {
-//		t.Errorf("ожидался статус %d, но получен %d", http.StatusInternalServerError, w.Code)
-//	}
-//}
+func TestPostBatchDB_StorageError(t *testing.T) {
+	testURL := "https://youtube.com"
+
+	reseltMultip := []models.ResultMultipleURL{}
+
+	multipleURL := models.MultipleURL{
+		CorrelationID: "1",
+		OriginalURL:   testURL,
+	}
+
+	marsh, err := json.Marshal([]models.MultipleURL{multipleURL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf := bytes.NewReader(marsh)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockPostgre := mocks.NewMockStorage(ctrl)
+	mockErr := errors.New("Some error")
+	mockPostgre.EXPECT().SaveSliceOfDB(gomock.Any(), gomock.Any(), gomock.Any()).Return(reseltMultip, mockErr)
+
+	logger := logger.NewLogger(logger.WithLevel("info"))
+
+	service := service.NewService(mockPostgre, logger)
+	handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
+
+	req, err := http.NewRequest("POST", "/api/shorten/batch", buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.WithValue(req.Context(), middleware.UserIDContextKey, "userID")
+	req = req.WithContext(ctx)
+
+	w := httptest.NewRecorder()
+	handlers.PostBatchDB(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("ожидался статус %d, но получен %d", http.StatusInternalServerError, w.Code)
+	}
+}
 
 func TestPostBatchDB_EmptyRequest(t *testing.T) {
 
@@ -295,5 +317,149 @@ func TestPostBatchDB_EmptyRequest(t *testing.T) {
 
 	if w.Code != http.StatusNotFound {
 		t.Errorf("ожидался статус %d, но получен %d", http.StatusNotFound, w.Code)
+	}
+}
+
+func TestHandlers_GetUsersURLs(t *testing.T) {
+	tests := []struct {
+		name         string
+		expectedCode int
+		userURLs     []*models.UserURLs
+		expectedErr  error
+		ctx          bool
+	}{
+		{
+			name: "successful_get",
+			userURLs: []*models.UserURLs{
+				{
+					ShortURL:    "test",
+					OriginalURL: "original_test",
+				},
+			},
+			expectedCode: 200,
+		},
+		{
+			name:         "bad_request_context",
+			ctx:          true,
+			expectedCode: 401,
+		},
+		{
+			name:         "no_found_urls",
+			expectedErr:  sql.ErrNoRows,
+			expectedCode: 204,
+		},
+		{
+			name:         "bad_get_all_url",
+			expectedErr:  errors.New("error_not_sql"),
+			expectedCode: 400,
+		},
+		{
+			name:         "len_0",
+			expectedCode: 204,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockPostgre := mocks.NewMockStorage(ctrl)
+
+			logger := logger.NewLogger(logger.WithLevel("info"))
+
+			service := service.NewService(mockPostgre, logger)
+
+			handlers := &Handlers{service: service, baseURL: "http://localhost:8080/", logger: logger}
+
+			req := httptest.NewRequest("GET", "/", nil)
+
+			if !tt.ctx {
+				ctx := context.WithValue(req.Context(), middleware.UserIDContextKey, "userID")
+				req = req.WithContext(ctx)
+			}
+
+			mockPostgre.EXPECT().GetAllURL(gomock.Any(), gomock.Any()).Return(tt.userURLs, tt.expectedErr).AnyTimes()
+
+			resp := httptest.NewRecorder()
+
+			handlers.GetUsersURLs(resp, req)
+
+			if resp.Code != tt.expectedCode {
+				t.Errorf("ожидался статус %d, но получен %d", tt.expectedCode, resp.Code)
+			}
+
+		})
+	}
+}
+
+func TestHandlers_DeletionURLs(t *testing.T) {
+	tests := []struct {
+		name              string
+		body              string
+		expectedCode      int
+		expectedWorkerErr error
+		ctx               bool
+	}{
+		{
+			name:         "successful",
+			body:         `["http://example.com", "http://example2.com"]`,
+			expectedCode: 202,
+		},
+		{
+			name:         "invalid_body",
+			expectedCode: 500,
+		},
+		{
+			name:              "invalid_worker",
+			body:              `["http://example.com", "http://example2.com"]`,
+			expectedWorkerErr: errors.New("invalid_worker"),
+			expectedCode:      500,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			//создаем logger.
+			loger := logger.NewLogger()
+
+			//создаем заглушку базы.
+			dbMock := mocks.NewMockStorage(ctrl)
+
+			//создаем сервис.
+			service := service.NewService(dbMock, loger)
+
+			//создаем заглушку worker.
+			workerMock := workers.NewMockWorker(ctrl)
+			workerMock.EXPECT().SendDeletionRequestToWorker(gomock.Any()).Return(tt.expectedWorkerErr).AnyTimes()
+
+			//создаем запрос.
+			req := httptest.NewRequest(http.MethodDelete, "/", bytes.NewBuffer([]byte(tt.body)))
+
+			resp := httptest.NewRecorder()
+
+			//создаем контекст авторизации.
+			if !tt.ctx {
+				ctx := context.WithValue(req.Context(), middleware.UserIDContextKey, "userID")
+				req = req.WithContext(ctx)
+			}
+
+			//собираем handler.
+			handler := &Handlers{
+				service: service,
+				baseURL: "http://localhost:8080/",
+				logger:  loger,
+				worker:  workerMock,
+			}
+
+			handler.DeletionURLs(resp, req)
+
+			if resp.Code != tt.expectedCode {
+				t.Errorf("ожидался статус %d, но получен %d", tt.expectedCode, resp.Code)
+			}
+		})
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// уровни логирования.
 const (
 	LevelInfo  = slog.LevelInfo
 	LevelWarn  = slog.LevelWarn
@@ -12,6 +13,7 @@ const (
 	LevelDebug = slog.LevelDebug
 )
 
+// псевдонимы для slog.
 type (
 	Logger         = slog.Logger
 	Attr           = slog.Attr
@@ -22,6 +24,7 @@ type (
 	LogValuer      = slog.LogValuer
 )
 
+// псевдонимы для slog.
 var (
 	NewTextHandler = slog.NewTextHandler
 	NewJSONHandler = slog.NewJSONHandler
@@ -41,22 +44,27 @@ var (
 	Group      = slog.Group
 )
 
+// Float32Attr преобразует float32 в float64.
 func Float32Attr(key string, val float32) Attr {
 	return slog.Float64(key, float64(val))
 }
 
+// Uint32Attr преобразует uint32 в int.
 func Uint32Attr(key string, val uint32) Attr {
 	return slog.Int(key, int(val))
 }
 
+// Int32Attr преобразует int32 в int.
 func Int32Attr(key string, val int32) Attr {
 	return slog.Int(key, int(val))
 }
 
+// TimeAttr преобразует time.Time в string.
 func TimeAttr(key string, time time.Time) Attr {
 	return slog.String(key, time.String())
 }
 
+// ErrAttr преобразует error в string.
 func ErrAttr(err error) Attr {
 	return slog.String("error", err.Error())
 }

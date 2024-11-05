@@ -29,14 +29,20 @@ func TestWebhook(t *testing.T) {
 		expectedCode int
 		expectedBody string
 	}{
-		{method: http.MethodGet, expectedCode: http.StatusMethodNotAllowed, expectedBody: ""},
-		{method: http.MethodPost, expectedCode: http.StatusNotFound, expectedBody: successBody},
+		{
+			method:       http.MethodGet,
+			expectedCode: http.StatusMethodNotAllowed,
+			expectedBody: "",
+		},
+		{
+			method:       http.MethodPost,
+			expectedCode: http.StatusNotFound,
+			expectedBody: successBody,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run("testing_"+tc.method, func(t *testing.T) {
-			// создаём connect
-			//dsm, _ := db.NewPstStorage("")
 
 			r := httptest.NewRequest(tc.method, "/", nil)
 			w := httptest.NewRecorder()

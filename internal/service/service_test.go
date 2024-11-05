@@ -1,9 +1,10 @@
 package service
 
 import (
+	"testing"
+
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestNewService(t *testing.T) {
@@ -12,4 +13,11 @@ func TestNewService(t *testing.T) {
 		s := NewService(nil, logs)
 		assert.NotNil(t, s)
 	})
+}
+
+func BenchmarkNewService(b *testing.B) {
+
+	for i := 0; i < b.N; i++ {
+		NewService(nil, logger.NewLogger(logger.WithLevel("info")))
+	}
 }

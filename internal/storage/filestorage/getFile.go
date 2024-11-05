@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"os"
+
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
+// GetURL возвращает оригинальный URL по короткому URL.
 func (s *SaveFile) GetURL(shortURL string) (string, error) {
 	// Читаем содержимое файла
 	readFile, err := os.Open(s.file.Name())
@@ -33,6 +35,7 @@ func (s *SaveFile) GetURL(shortURL string) (string, error) {
 	return "", errors.New("короткий URL не найден")
 }
 
+// GetAllURL возвращает все сохраненные URL-адреса пользователя.
 func (s *SaveFile) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
 	return nil, errors.New("not use GetAllURL in file")
 }

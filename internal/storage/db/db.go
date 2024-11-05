@@ -3,19 +3,25 @@ package db
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
+// PsqlStorage - интерфейс хранилища для PostgreSQL.
+//
+//go:generate mockgen -source=db.go -destination=mock_db.go -package=db
 type PsqlStorage interface {
 	initDB(dataSourceName string) error
 	Ping() error
 	Close() error
 }
 
+// PstStorage - хранилище для PostgreSQL.
 type PstStorage struct {
 	storage *sql.DB
 }
 
+// NewPstStorage - создает новое хранилище для PostgreSQL.
 func NewPstStorage(dataSourceName string) (*PstStorage, error) {
 	p := &PstStorage{}
 	err := p.initDB(dataSourceName)
@@ -39,7 +45,7 @@ func (p *PstStorage) initDB(dataSourceName string) error {
 	return nil
 }
 
-// Функция для создания таблицы, если она не существует
+// CreateTableIfNotExists функция для создания таблицы, если она не существует
 func (p *PstStorage) CreateTableIfNotExists() error {
 	db, err := p.storage.Begin()
 	if err != nil {
@@ -78,10 +84,12 @@ func (p *PstStorage) CreateTableIfNotExists() error {
 	return nil
 }
 
+// Ping проверяет соединение с базой данных.
 func (p *PstStorage) Ping() error {
 	return p.storage.Ping()
 }
 
+// Close закрывает соединение с базой данных.
 func (p *PstStorage) Close() error {
 	return p.storage.Close()
 }

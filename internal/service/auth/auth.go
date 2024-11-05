@@ -2,23 +2,29 @@ package auth
 
 import (
 	"fmt"
+	"github.com/kamencov/go-musthave-shortener-tpl/internal/errorscustom"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
-	"time"
 )
 
+// SecretSalt - соль для шифрования.
 const (
 	SecretSalt = "practicumSecretKey32"
 	tokenSalt  = "tokenPracticum32"
 )
 
+// AuthService сервис отвечающий за авторизацию и верификацию.
+//
+//go:generate mockgen -source=auth.go -destination=mock_auth.go -package=auth
 type AuthService interface {
-	//CheckUserDB(userID string) error
 	VerifyUser(token string) (string, error)
 	CreatTokenForUser(userID string) (string, error)
 }
 
+// ServiceAuth - сервис для работы с JWT.
 type ServiceAuth struct {
 	passwordSalt []byte
 	tokenSalt    []byte
@@ -27,6 +33,7 @@ type ServiceAuth struct {
 	userStorage    service.Storage
 }
 
+// NewServiceAuth - конструктор для сервиса авторизации.
 func NewServiceAuth(storage service.Storage) *ServiceAuth {
 	return &ServiceAuth{
 		passwordSalt: []byte(SecretSalt),
@@ -37,11 +44,20 @@ func NewServiceAuth(storage service.Storage) *ServiceAuth {
 	}
 }
 
+// VerifyUser godoc
+// @Tags AUTH_SERVICE
+// @Summary Verify user
+// @Description Verify user
+// @Param VerifyUser body string true "token"
+// @Success 200
+// @Failure 500 "Internal server error"
+// @Router / [options]
+// VerifyUser проверяет наличие токена в заголовке Authorization.
 func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	claims := &models.Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("incorrect method")
+			return nil, errorscustom.ErrBadVarifyToken
 		}
 
 		return sa.passwordSalt, nil
@@ -53,6 +69,7 @@ func (sa *ServiceAuth) VerifyUser(token string) (string, error) {
 	return claims.UserID, nil
 }
 
+// CreatTokenForUser создает JWT-токен для пользователя.
 func (sa *ServiceAuth) CreatTokenForUser(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,

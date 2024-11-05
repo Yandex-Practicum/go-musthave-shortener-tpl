@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/service"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/db"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/filestorage"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/storage/mapstorage"
 )
 
+// initDB инициализация базы.
 func initDB(addrDB, pathFile string) service.Storage {
 
 	if addrDB != "" {
