@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// RunRevive запускает revive и возвращает его вывод.
 func RunRevive() (string, error) {
 	// Определяем путь к исполняемому файлу
 	executablePath, err := os.Executable()
