@@ -16,12 +16,10 @@ import (
 	"strings"
 )
 
-// main - точка входа.
-func main() {
-	var mychecks []*analysis.Analyzer
-
-	// определяем мультипроверку
-	mychecks = append(mychecks,
+// configureAnalyzers настраивает и возвращает список анализаторов.
+func configureAnalyzers() []*analysis.Analyzer {
+	var analyzers []*analysis.Analyzer
+	analyzers = append(analyzers,
 		noexit.NoExitAnalyzer,
 		printf.Analyzer,
 		shadow.Analyzer,
@@ -30,32 +28,41 @@ func main() {
 
 	// Добавляем все SA-анализаторы из пакета staticcheck
 	for _, a := range staticcheck.Analyzers {
-		if a.Analyzer.Name[:2] == "SA" { // фильтр SA-анализаторов
-			mychecks = append(mychecks, a.Analyzer)
+		if a.Analyzer.Name[:2] == "SA" {
+			analyzers = append(analyzers, a.Analyzer)
 		}
 	}
 
-	// Подключаем анализатор ST1000 (класс ST)
+	// Подключаем анализатор S1005 (класс S)
 	for _, a := range simple.Analyzers {
 		if a.Analyzer.Name == "S1005" || a.Analyzer.Name == "S1006" {
-			mychecks = append(mychecks, a.Analyzer)
+			analyzers = append(analyzers, a.Analyzer)
 			break
 		}
 	}
 
-	// Подключаем публичные анализаторы
-	// Запускаем revive
-	reviveOutput, err := revive.RunRevive()
+	return analyzers
+}
+
+// runRevive запускает revive и возвращает вывод и ошибку.
+func runRevive() (string, error) {
+	return revive.RunRevive()
+}
+
+func main() {
+	// Настройка анализаторов
+	mychecks := configureAnalyzers()
+
+	// Запуск revive
+	reviveOutput, err := runRevive()
 	if err != nil {
 		log.Fatalf("ошибка запуска revive: %v\n%s", err, reviveOutput)
 	}
 
-	// Выводим результаты revive
+	// Вывод результатов revive
 	fmt.Println("Revive Output:")
 	fmt.Println(strings.TrimSpace(reviveOutput))
 
-	// Запускаем multichecker с добавленными анализаторами
-	multichecker.Main(
-		mychecks...,
-	)
+	// Запуск multichecker
+	multichecker.Main(mychecks...)
 }
