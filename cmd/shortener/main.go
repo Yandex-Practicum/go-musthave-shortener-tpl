@@ -110,7 +110,17 @@ func main() {
 	go worker.StartWorkerDeletion(ctx)
 
 	// слушаем выбранны порт = configs.AddrServer.
-	if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
-		logs.Error("Err:", logger.ErrAttr(err))
+	if *configs.HTTPS {
+		logs.Info("Starting HTTPS server with self-signed certificate")
+		// Настройка HTTPS-сервера с самоподписанным сертификатом
+		err := http.ListenAndServeTLS(configs.AddrServer, "./cert.pem", "./key.pem", r)
+		if err != nil {
+			logs.Error("Failed to start HTTPS server:", logger.ErrAttr(err))
+		}
+	} else {
+		logs.Info("Starting HTTP server")
+		if err := http.ListenAndServe(configs.AddrServer, r); err != nil {
+			logs.Error("Failed to start HTTP server:", logger.ErrAttr(err))
+		}
 	}
 }

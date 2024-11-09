@@ -81,3 +81,68 @@ func TestPstStorage_GetURL(t *testing.T) {
 	// Проверяем, что все ожидания для mock были вызваны
 	require.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestPstStorage_GetAllURL(t *testing.T) {
+
+	// Создаем mock SQL соединение
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+
+	// Инициализируем PstStorage с mock-базой данных
+	pstStorage := &PstStorage{storage: db}
+
+	tests := []struct {
+		name         string
+		userID       string
+		baseURL      string
+		expectedErr  error
+		mockBehavior func()
+	}{
+		{
+			name:        "successful",
+			userID:      "test",
+			baseURL:     "http://localhost:8080",
+			expectedErr: nil,
+			mockBehavior: func() {
+				mock.ExpectBegin()
+				rows := mock.NewRows([]string{"short_url", "original_url"}).
+					AddRow("qwerty", "https://ya.ru")
+				mock.ExpectQuery("SELECT short_url, original_url FROM urls WHERE user_id = \\$1").
+					WithArgs("test").
+					WillReturnRows(rows)
+				mock.ExpectCommit()
+			},
+		},
+		{
+			name:        "rows_error",
+			userID:      "test",
+			baseURL:     "http://localhost:8080",
+			expectedErr: sql.ErrNoRows,
+			mockBehavior: func() {
+				mock.ExpectBegin()
+				mock.ExpectQuery("SELECT short_url, original_url FROM urls WHERE user_id = \\$1").
+					WithArgs("").
+					WillReturnError(sql.ErrNoRows)
+				mock.ExpectRollback()
+				mock.ExpectCommit()
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockBehavior()
+			_, err := pstStorage.GetAllURL(tt.userID, tt.baseURL)
+			//if !errors.Is(err, tt.expectedErr) {
+			//	t.Errorf("Ожидали ошибку = %v, а пришло = %v", tt.expectedErr, err)
+			//}
+			if tt.expectedErr != nil {
+				require.ErrorIs(t, err, tt.expectedErr)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+
+}

@@ -13,6 +13,7 @@ type Configs struct {
 	LogLevel   string
 	PathFile   string
 	AddrDB     string
+	HTTPS      *bool
 }
 
 // NewConfigs конструктор конфига.
@@ -47,6 +48,11 @@ func (c *Configs) Parse() {
 		c.AddrDB = envAddrDB
 	}
 
+	// Проверка переменной окружения ENABLE_HTTPS
+	if envHTTPS := os.Getenv("ENABLE_HTTPS"); envHTTPS == "true" {
+		*c.HTTPS = true
+	}
+
 }
 
 // parseFlags флаги которые можно задать при запуске.
@@ -67,5 +73,8 @@ func (c *Configs) parseFlags() {
 
 	// Флаг -p отвечает за адрес подключения DB
 	flag.StringVar(&c.AddrDB, "d", "", "address DB")
+
+	// Флаг -s отвечает за включение HTTPS в веб версии
+	c.HTTPS = flag.Bool("s", false, "Enable HTTPS")
 	flag.Parse()
 }
