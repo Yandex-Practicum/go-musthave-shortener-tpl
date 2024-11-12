@@ -1,0 +1,34 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ iter20 ]
+  pull_request:
+    branches: [ iter20 ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.22.3'  # Укажите вашу версию Go
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run tests with coverage
+        run: |
+          go test -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          file: coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}  # Используйте секрет для токена

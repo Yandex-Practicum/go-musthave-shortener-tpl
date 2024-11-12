@@ -60,7 +60,7 @@ func (s *MapStorage) Ping() error {
 }
 
 // SaveSliceOfDB сохраняет срез URL в хранилище.
-func (s *MapStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
+func (s *MapStorage) SaveSlice(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	return nil, nil
 }
 

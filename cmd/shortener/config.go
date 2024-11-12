@@ -1,3 +1,4 @@
+// Package main предоставляет конфигурацию при запуске.
 package main
 
 import (

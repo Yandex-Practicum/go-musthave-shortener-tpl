@@ -9,6 +9,12 @@ import (
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/models"
 )
 
+// ErrShortURLNoFound - ошибка, если короткий URL не найден.
+var (
+	ErrNoUseInFile     = errors.New("not use GetAllURL in file")
+	ErrShortURLNoFound = errors.New("короткий URL не найден")
+)
+
 // GetURL возвращает оригинальный URL по короткому URL.
 func (s *SaveFile) GetURL(shortURL string) (string, error) {
 	// Читаем содержимое файла
@@ -32,10 +38,10 @@ func (s *SaveFile) GetURL(shortURL string) (string, error) {
 		}
 	}
 
-	return "", errors.New("короткий URL не найден")
+	return "", ErrShortURLNoFound
 }
 
 // GetAllURL возвращает все сохраненные URL-адреса пользователя.
 func (s *SaveFile) GetAllURL(userID, baseURL string) ([]*models.UserURLs, error) {
-	return nil, errors.New("not use GetAllURL in file")
+	return nil, ErrNoUseInFile
 }

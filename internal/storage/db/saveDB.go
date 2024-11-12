@@ -33,7 +33,7 @@ func (p *PstStorage) SaveURL(shortURL, originalURL, userID string) error {
 }
 
 // SaveSliceOfDB сохраняет множество URL в базе данных.
-func (p *PstStorage) SaveSliceOfDB(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
+func (p *PstStorage) SaveSlice(urls []models.MultipleURL, baseURL, userID string) ([]models.ResultMultipleURL, error) {
 	var resultMultipleURL []models.ResultMultipleURL
 
 	tx, err := p.storage.Begin()

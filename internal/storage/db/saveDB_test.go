@@ -114,7 +114,7 @@ func TestPstStorage_SaveSliceOfDB(t *testing.T) {
 			mock.ExpectRollback() // Откат транзакции для обоих вызовов SaveURL
 			mock.ExpectCommit()
 
-			_, err = storage.SaveSliceOfDB(tt.urls, tt.baseURL, tt.userID)
+			_, err = storage.SaveSlice(tt.urls, tt.baseURL, tt.userID)
 
 			// Сравнение ошибок
 			if err != nil && tt.expectedErr != nil {

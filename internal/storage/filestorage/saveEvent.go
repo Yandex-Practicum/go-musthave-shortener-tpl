@@ -76,21 +76,6 @@ type ReadFile struct {
 	decoder *json.Decoder
 }
 
-// NewReadFile создает новый ReadFile.
-func NewReadFile(filename string) (*ReadFile, error) {
-	// откройте файл и создайте для него json.Decoder
-	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ReadFile{
-		file:    file,
-		decoder: json.NewDecoder(file),
-	}, nil
-
-}
-
 // ReadEvent читает Event из файл.
 func (c *ReadFile) ReadEvent() (*Event, error) {
 	// добавьте вызов Decode для чтения и десериализации

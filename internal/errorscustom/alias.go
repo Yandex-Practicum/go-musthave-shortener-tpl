@@ -11,5 +11,5 @@ var ErrUserIDNotContext = errors.New("userID not found or empty")
 // ErrDeletedURL указывает на удаление URL.
 var ErrDeletedURL = errors.New("URL DELETED")
 
-// ErrBadToken указывает что токен не прошел верификацию
+// ErrBadVarifyToken указывает что токен не прошел верификацию
 var ErrBadVarifyToken = errors.New("incorrect token")
