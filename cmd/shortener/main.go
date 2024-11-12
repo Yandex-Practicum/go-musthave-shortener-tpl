@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	middleware2 "github.com/go-chi/chi/v5/middleware"
 	"net/http"
 
 	_ "net/http/pprof"
 
 	"github.com/go-chi/chi/v5"
-	middleware2 "github.com/go-chi/chi/v5/middleware"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/handlers"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/logger"
 	"github.com/kamencov/go-musthave-shortener-tpl/internal/middleware"
@@ -65,7 +65,7 @@ func main() {
 		repo,
 		logs,
 	)
-	logs.Info(("Service created"))
+	logs.Info("Service created")
 
 	// инициализируем проверку авторизацию.
 	serviceAuth := auth.NewServiceAuth(repo)
@@ -86,7 +86,11 @@ func main() {
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	// Добавляем pprof маршруты вручную.
-	r.Mount("/debug", middleware2.Profiler())
+	// Ограничим доступ с помощью контроля ip.
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.PprofMiddleware)
+		r.Mount("/debug", middleware2.Profiler())
+	})
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.GZipMiddleware)
