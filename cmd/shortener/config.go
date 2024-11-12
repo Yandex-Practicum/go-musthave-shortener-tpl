@@ -4,17 +4,18 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
 )
 
 // Configs структура основных зависимостей при запуске.
 type Configs struct {
-	AddrServer string
-	BaseURL    string
-	LogLevel   string
-	PathFile   string
-	AddrDB     string
-	HTTPS      *bool
+	AddrServer string `json:"server_address"`
+	BaseURL    string `json:"base_url"`
+	LogLevel   string `json:"log_level"`
+	PathFile   string `json:"file_storage_path"`
+	AddrDB     string `json:"database_dsn"`
+	HTTPS      *bool  `json:"enable_https"`
 	ConfigFile string
 }
 
@@ -25,8 +26,21 @@ func NewConfigs() *Configs {
 
 // Parse проверка зависимостей и перезапись Configs.
 func (c *Configs) Parse() {
+	// Разбираем флаги, включая путь к конфигурационному файлу
 	c.parseFlags()
 
+	// Если указан JSON-файл конфигурации, загружаем его
+	if c.ConfigFile != "" {
+		if err := c.loadConfig(); err != nil {
+			fmt.Printf("Ошибка загрузки конфигурации из файла %s: %v\n", c.ConfigFile, err)
+		}
+	}
+
+	// Переопределяем параметры значениями из переменных окружения
+	c.parseEnv()
+}
+
+func (c *Configs) parseEnv() {
 	// Проверка переменной окружения SERVER_ADDRESS
 	serverAdd := os.Getenv("SERVER_ADDRESS")
 	if serverAdd != "" {
@@ -57,6 +71,7 @@ func (c *Configs) Parse() {
 
 }
 
+// loadConfig загружает конфигурационный файл.
 func (c *Configs) loadConfig() error {
 	file, err := os.Open(c.ConfigFile)
 	if err != nil {

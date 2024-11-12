@@ -1,11 +1,13 @@
 package main
 
 import (
+	"os"
 	"testing"
 )
 
 // TestParse - тестирует парсинг конфигурационной строки.
 func TestParse(t *testing.T) {
+	defer os.Remove(`./test_file`)
 	tests := []struct {
 		name     string
 		addrServ string

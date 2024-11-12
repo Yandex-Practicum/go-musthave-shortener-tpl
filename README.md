@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/github/kamencov/go-musthave-shortener-tpl/branch/iter21/graph/badge.svg?token=I5FBFXI05E)](https://codecov.io/github/kamencov/go-musthave-shortener-tpl)
+[![codecov](https://codecov.io/github/kamencov/go-musthave-shortener-tpl/branch/iter22/graph/badge.svg?token=I5FBFXI05E)](https://codecov.io/github/kamencov/go-musthave-shortener-tpl)
 
 
 # go-musthave-shortener-tpl
