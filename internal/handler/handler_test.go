@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klyakssa/go-musthave-shortener-tpl/internal/config"
 	"github.com/klyakssa/go-musthave-shortener-tpl/internal/handler"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -43,6 +44,8 @@ func TestMainHandler(t *testing.T) {
 			},
 		},
 	}
+	config := config.InitFlagConfig()
+	handler := handler.NewMyHandler(config)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(test.want.url))

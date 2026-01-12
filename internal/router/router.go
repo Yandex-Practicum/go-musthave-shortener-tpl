@@ -4,15 +4,18 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/klyakssa/go-musthave-shortener-tpl/internal/config"
 )
 
 type MyRouter struct {
 	Engine *gin.Engine
+	Config *config.Config
 }
 
-func NewMyRouter() *MyRouter {
+func NewMyRouter(cfg *config.Config) *MyRouter {
 	return &MyRouter{
 		Engine: gin.Default(),
+		Config: cfg,
 	}
 }
 
