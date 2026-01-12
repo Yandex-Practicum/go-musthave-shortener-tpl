@@ -4,5 +4,6 @@ all: build
 build:
 	go build -o ./cmd/shortener ./cmd/shortener
 
-my-test:
-	./shortenertest -test.v -test.run=^TestIteration1$ -binary-path=cmd/shortener/shortener
+test:
+	go clean -testcache
+	go test -count 1 -v ./...

@@ -35,10 +35,11 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "text/plain")
-		w.Header().Set("Content-Length", strconv.Itoa(len(shrt)))
+		w.Header().Set("Content-Length", strconv.Itoa(len("http://localhost:8080/"+shrt)))
+		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("http://localhost:8080/" + shrt))
+
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 	}
