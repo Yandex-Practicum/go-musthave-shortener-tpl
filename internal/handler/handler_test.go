@@ -47,7 +47,7 @@ func TestMainHandler(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(test.want.url))
 			w := httptest.NewRecorder()
-			handler.MainHandler(w, request)
+			handler.ShortenHandler(w, request)
 
 			res := w.Result()
 			assert.Equal(t, test.want.codePost, res.StatusCode)
@@ -62,7 +62,7 @@ func TestMainHandler(t *testing.T) {
 
 			request2 := httptest.NewRequest(http.MethodGet, string(resBody), nil)
 			w2 := httptest.NewRecorder()
-			handler.MainHandler(w2, request2)
+			handler.UnshortenHandler(w2, request2)
 
 			res2 := w2.Result()
 

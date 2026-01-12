@@ -7,8 +7,9 @@ import (
 
 func main() {
 	r := router.NewMyRouter()
-	r.HandleFunc("/", handler.MainHandler)
-	
+	r.GET("/:uuid", handler.UnshortenHandler)
+	r.POST("/", handler.ShortenHandler)
+
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
