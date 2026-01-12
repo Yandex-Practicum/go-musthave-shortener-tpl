@@ -33,6 +33,15 @@ func TestMainHandler(t *testing.T) {
 				contentType: "text/plain",
 			},
 		},
+		{
+			name: "test #2",
+			want: want{
+				codePost:    201,
+				codeGet:     307,
+				url:         "https://practicum.yandex.ru",
+				contentType: "text/plain",
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
